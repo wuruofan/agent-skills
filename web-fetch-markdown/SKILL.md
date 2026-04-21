@@ -1,5 +1,6 @@
 ---
 name: web-fetch-markdown
+version: "1.1.0"
 description: Fetches web pages from specific URLs and converts them to clean, structured Markdown, enabling Agents to parse and extract data more effectively than from raw HTML. Use when user provides a URL to fetch or encounters "Unable to verify if domain" errors.
 ---
 
