@@ -1,6 +1,6 @@
 # agent-skills
 
-A collection of universal AI Agent skills, compatible with Claude Code, OpenCode, and other major Agent frameworks.
+Universal AI Agent skills collection, compatible with Claude Code, OpenCode, and other major Agent frameworks.
 
 ## Installation
 
@@ -10,20 +10,21 @@ npx skills add wuruofan/agent-skills -g -y
 
 ## Included Skills
 
-### web-fetch-markdown
+### web-fetch-as-markdown
 
-Converts web URLs to Markdown, bypassing domain security checks in Agents.
+Fetches any web URL and converts it to clean, structured Markdown — stripping ads, navigation, and clutter to leave only readable content.
 
 **Use Cases:**
-- Websites that proxy services cannot directly access
-- When you need to fetch external webpage content
+- Bypass domain safety restrictions in Agents
+- Convert webpages to clean markdown for easier parsing
 - When encountering "Unable to verify if domain" errors
 
-**Proxy Services:**
-1. `https://markdown.new/` - Preferred, supports Cloudflare-hosted sites
-2. `https://markdownforagents.com/r?url=` - Alternative
+**Conversion Services:**
+1. `https://markdown.new/` - Primary (Cloudflare, optimized for token reduction)
+2. `https://r.jina.ai/<url>` - Fallback 1 (Jina AI Reader API)
+3. `https://markdownforagents.com/r?url=<url>` - Fallback 2 (requires user consent)
 
-**Trigger Words:** "fetch webpage", "look up", "search online"
+**Trigger Words:** "fetch webpage", "look up", "search online", "parse data from"
 
 ---
 
