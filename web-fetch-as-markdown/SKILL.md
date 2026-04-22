@@ -1,9 +1,10 @@
 ---
-name: Web Fetch as Markdown
+name: web-fetch-as-markdown
 description: Fetches web pages from specific URLs and converts them to clean, structured Markdown via trusted APIs, enabling Agents to parse and extract data more effectively.
-version: 1.2.0
-author: @wuruofan
 license: MIT-0
+metadata:
+  author: "@wuruofan"
+  version: "1.2.1"
 ---
 
 # Web Fetch as Markdown
