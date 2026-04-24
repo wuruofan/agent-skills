@@ -8,6 +8,7 @@ commands:
   - restore
   - brief
   - archive
+  - summary
 ---
 
 # Progress Skill
