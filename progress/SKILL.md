@@ -1,7 +1,7 @@
 ---
 name: progress
 description: Project development progress tracking, work session recovery, daily/weekly report generation, history archiving, and current progress summaries
-version: 1.4.0
+version: 1.5.0
 commands:
   - show
   - checkpoint
