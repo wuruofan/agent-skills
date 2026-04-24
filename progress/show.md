@@ -1,29 +1,29 @@
 # /progress show
 
-## 指令
+## Command
 
-读取当前项目的 `PROGRESS.md`，提取关键信息并格式化输出。
+Read the current project's `PROGRESS.md`, extract key information and format the output.
 
-## 执行流程
+## Execution Flow
 
-1. 定位并读取 `PROGRESS.md`。
-2. 解析文件，提取以下部分：
-   - 🎯 当前聚焦的任务
-   - 📥 待办队列的前 5 项
-   - ✅ 最近完成的任务数量
-   - 📅 任务历史的最近 3 天记录
-   - ⚡ 快速恢复步骤
-   - 🏛️ 归档链接
-3. 若文件不存在，提示运行 `/progress checkpoint` 初始化。
+1. Locate and read `PROGRESS.md`.
+2. Parse the file, extracting the following sections:
+   - 🎯 Current Focus tasks
+   - 📥 Todo Queue (first 5 items)
+   - ✅ Recently Completed task count
+   - 📅 Task History (last 3 days)
+   - ⚡ Quick Recovery steps
+   - 🏛️ Archive Links
+3. If the file does not exist, prompt to run `/progress checkpoint` to initialize.
 
-## 输出格式
+## Output Format
 
 ```
-📊 **项目进度概览**
-- **当前焦点**: [列出 🎯 下的任务]
-- **下一步**: [列出 📥 下的前几项]
-- **最近完成**: [数量]项
-- **最近 3 天任务**: [列出 📅 下的最近 3 天记录]
-- **恢复指引**: [列出 ⚡ 下的步骤]
-- **归档链接**: [列出 🏛️ 下的最近归档链接]
+📊 **Project Progress Overview**
+- **Current Focus**: [List tasks under 🎯]
+- **Next Steps**: [List first items under 📥]
+- **Recently Completed**: [count] items
+- **Last 3 Days Tasks**: [List last 3 days under 📅]
+- **Recovery Guide**: [List steps under ⚡]
+- **Archive Links**: [List recent links under 🏛️]
 ```

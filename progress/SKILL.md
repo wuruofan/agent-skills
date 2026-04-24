@@ -17,14 +17,55 @@ Track project development progress, enable cross-device work session saving and 
 
 ## Commands Overview
 
-| Command | Description | Use Case |
-|---------|-------------|----------|
-| `show` | Display a quick overview of project status from PROGRESS.md | Daily quick check of project status |
-| `checkpoint` | Save progress, update PROGRESS.md, and create a Git commit | Regularly save work progress |
-| `restore` | Recover work session and sync remote progress | Resume work on a new device |
-| `brief` | Generate daily/weekly reports with code change statistics | Generate periodic reports |
-| `archive` | Archive historical records older than 7 days | Maintain PROGRESS.md size |
-| `summary` | Generate a detailed summary of current progress including uncommitted changes | Get detailed current status without committing |
+| Command | Abbreviation | Description | Use Case |
+|---------|-------------|-------------|----------|
+| `show` | `s` | Display a quick overview of project status from PROGRESS.md | Daily quick check of project status |
+| `checkpoint` | `c` | Save progress, update PROGRESS.md, and create a Git commit | Regularly save work progress |
+| `restore` | `r` | Recover work session and sync remote progress | Resume work on a new device |
+| `brief` | `b` | Generate daily/weekly reports with code change statistics | Generate periodic reports |
+| `archive` | `a` | Archive historical records older than 7 days | Maintain PROGRESS.md size |
+| `summary` | `sum` | Generate a detailed summary of current progress including uncommitted changes | Get detailed current status without committing |
+
+## Command Abbreviations
+
+To improve user experience and reduce typing effort, the progress skill supports command abbreviations. The following abbreviations are available:
+
+| Command | Abbreviation |
+|---------|-------------|
+| `show` | `s` |
+| `checkpoint` | `c` |
+| `restore` | `r` |
+| `brief` | `b` |
+| `archive` | `a` |
+| `summary` | `sum` |
+
+### Usage Examples
+
+```bash
+# Full command
+/progress show
+
+# Abbreviated command
+/progress s
+
+# Full command
+/progress checkpoint "Implement user authentication"
+
+# Abbreviated command
+/progress c "Implement user authentication"
+```
+
+### Design Principles
+
+The abbreviation scheme follows these industry best practices:
+
+1. **Simplicity**: Use 1-2 character abbreviations for most commands
+2. **Consistency**: Follow a logical pattern for all commands
+3. **Memorability**: Use the first letter of each command as the primary abbreviation
+4. **Avoid Conflicts**: Ensure all abbreviations are unique
+5. **Clarity**: For commands where the first letter is not distinctive, use a more descriptive abbreviation
+
+This scheme balances brevity with clarity, making the progress skill more user-friendly while maintaining compatibility with existing usage patterns.
 
 ## Global Rules
 
