@@ -1,6 +1,6 @@
 ---
 name: progress
-description: 项目开发进度追踪、工作现场恢复、日报周报生成与历史记录归档
+description: Project development progress tracking, work session recovery, daily/weekly report generation, and history archiving
 version: 1.1.0
 commands:
   - show
@@ -12,44 +12,44 @@ commands:
 
 # Progress Skill
 
-追踪项目开发进度，实现跨设备的工作现场保存与恢复，自动生成日报周报，并管理历史记录归档。
+Track project development progress, enable cross-device work session saving and recovery, automatically generate daily/weekly reports, and manage history archiving.
 
-## 全局规则
+## Global Rules
 
-1. **项目根目录检测**：从当前目录向上查找，直到找到包含 `.git` 或 `PROGRESS.md` 的目录作为项目根。
-2. **文件路径**：所有操作均针对项目根目录下的 `PROGRESS.md`。
-3. **语言跟随用户**：分析历史 commit 和用户输入，自动检测语言并生成对应语言的内容。支持通过 `--lang` 参数手动指定语言。
-4. **若 PROGRESS.md 不存在**：
-   - 询问用户："检测到项目尚未追踪进度，是否初始化 PROGRESS.md？"
-   - 用户确认后，直接在项目根目录写入以下标准结构：
+1. **Project Root Detection**: Search upward from the current directory until finding a directory containing `.git` or `PROGRESS.md` as the project root.
+2. **File Path**: All operations target `PROGRESS.md` in the project root directory.
+3. **Language Following User**: Analyze commit history and user input to automatically detect language and generate content in the corresponding language. Support for manually specifying language via `--lang` parameter.
+4. **If PROGRESS.md does not exist**:
+   - Ask user: "Project progress tracking not detected. Would you like to initialize PROGRESS.md?"
+   - After user confirmation, write the following standard structure directly in the project root directory:
 
 ```
 # Progress
 
-> 最后更新: {CURRENT_DATE}
+> Last updated: {CURRENT_DATE}
 
-## 🎯 当前聚焦
-<!-- 正在处理的核心任务，建议不超过 2 条 -->
+## 🎯 Current Focus
+<!-- Core tasks in progress, recommended no more than 2 -->
 
-## 📥 待办队列
-<!-- 下一步计划做的事 -->
+## 📥 Todo Queue
+<!-- Next planned tasks -->
 
-## ✅ 最近完成
-<!-- 仅保留最近 3-5 条，避免文件无限膨胀 -->
+## ✅ Recently Completed
+<!-- Keep only the last 3-5 items to avoid infinite file growth -->
 
-## 🧱 阻塞与问题
-<!-- 记录卡点，方便回溯 -->
+## 🧱 Blockers & Issues
+<!-- Record sticking points for easy review -->
 
-## 🧠 上下文备忘
-<!-- 关键决策、API 片段、调研结论 -->
+## 🧠 Context Notes
+<!-- Key decisions, API snippets, research conclusions -->
 
-## ⚡ 快速恢复
+## ⚡ Quick Recovery
 - `git pull`
 -
 
-## 📅 任务历史（最近 7 天）
-<!-- 自动生成，按日期倒序排列 -->
+## 📅 Task History (Last 7 days)
+<!-- Automatically generated, sorted by date in descending order -->
 
-## 🏛️ 归档链接
-<!-- 自动生成，指向历史归档文件 -->
+## 🏛️ Archive Links
+<!-- Automatically generated, pointing to historical archive files -->
 ```

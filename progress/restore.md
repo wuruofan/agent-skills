@@ -1,67 +1,67 @@
 # /progress restore
 
-## 指令
+## Command
 
-恢复工作现场，同步远程进度，提供上下文召回与开发环境启动。
+Restore work session, sync remote progress, provide context recall, and start development environment.
 
-## 执行流程
+## Execution Flow
 
-### Step 1: 检查本地状态
+### Step 1: Check Local Status
 
-- 执行 `git status`。
-- **若本地脏（有未提交更改）**：
-  - 输出警告："⚠️ 本地有未提交的更改，建议先 `/progress checkpoint` 处理。"
-  - 流程中止，让用户决定。
+- Execute `git status`.
+- **If local is dirty (has uncommitted changes)**:
+  - Output warning: "⚠️ Local has uncommitted changes,建议 first `/progress checkpoint` to handle."
+  - Abort process, let user decide.
 
-### Step 2: 检查远程进度更新
+### Step 2: Check Remote Progress Updates
 
-- 执行 `git fetch origin`。
-- 比对本地与远程的 `PROGRESS.md`。
-- **若远程有更新**：
-  - 展示远程 PROGRESS.md 的 diff 摘要。
-  - 询问："远程进度有更新，是否执行 `git pull --rebase`？"
-  - 用户确认后执行拉取。
-- **若远程无更新**：继续下一步。
+- Execute `git fetch origin`.
+- Compare local and remote `PROGRESS.md`.
+- **If remote has updates**:
+  - Display remote PROGRESS.md diff summary.
+  - Ask: "Remote progress has updates, execute `git pull --rebase`?"
+  - Execute pull after user confirmation.
+- **If remote has no updates**: Continue to next step.
 
-### Step 3: 读取多维度上下文
+### Step 3: Read Multi-dimensional Context
 
-读取以下内容构建恢复现场：
+Read the following content to build recovery context:
 
-1. **`PROGRESS.md`**：重点关注 🎯、📥、⚡ 分区，特别识别 WIP 状态的任务。
-2. **最近提交**：`git log -3 --stat`（了解上次退出的位置）。
-3. **WIP 任务检测**：分析最近提交中的 WIP 标记，识别未完成的功能。
-4. **最新设计文档**：
-   - **白名单目录**：仅在 `docs/`, `designs/`, `specs/`, `doc/`, `arch/` 及项目根目录搜索。
-   - **黑名单排除**：忽略 `CHANGELOG.md`, `README.md`, `LICENSE.md` 等。
-   - **时间窗口**：7 天内修改过的 `.md` 文件，读取其文件名和摘要。
+1. **`PROGRESS.md`**: Focus on 🎯, 📥, ⚡ sections, especially identify WIP status tasks.
+2. **Recent commits**: `git log -3 --stat` (understand last exit position).
+3. **WIP task detection**: Analyze WIP tags in recent commits, identify incomplete features.
+4. **Latest design documents**:
+   - **Whitelist directories**: Only search in `docs/`, `designs/`, `specs/`, `doc/`, `arch/` and project root directory.
+   - **Blacklist exclusion**: Ignore `CHANGELOG.md`, `README.md`, `LICENSE.md`, etc.
+   - **Time window**: `.md` files modified within 7 days, read their filenames and summaries.
 
-### Step 4: 输出恢复报告与启动环境
+### Step 4: Output Recovery Report and Start Environment
 
-结构化输出上下文，并交互式启动环境：
+Structured output context, and interactively start environment:
 
 ```
-🚀 **工作现场恢复报告**
+🚀 **Work Session Recovery Report**
 
-📍 **上次离开位置**
-- 最近提交: `<hash>` <message>
-- 改动文件: <list>
+📍 **Last Exit Position**
+- Recent commit: `<hash>` <message>
+- Changed files: <list>
 
-🎯 **当前聚焦**
-- [从 🎯 提取，特别标记 WIP 任务]
+🎯 **Current Focus**
+- [Extracted from 🎯, specially marked WIP tasks]
 
-📥 **下一步待办**
-- [从 📥 提取]
+📥 **Next Steps**
+- [Extracted from 📥]
 
-💡 **关联设计文档**
-- <file_path> (修改于 <date>)
+💡 **Related Design Documents**
+- <file_path> (modified on <date>)
 
-🛠 **准备启动开发环境**
-- 解析 `⚡ 快速恢复` 中的命令，若无则推断（依据 Makefile/package.json 等）。
-- 若解析失败或无命令可推断，提示用户："未检测到启动命令，请手动启动开发环境或更新 PROGRESS.md 中的 ⚡ 快速恢复 部分。"
-- 若有推断命令，询问："是否执行 `[推断/提取的命令]`？"
-- **自动回写**：若用户纠正了启动命令，自动将其更新至 `PROGRESS.md` 的 `⚡ 快速恢复` 分区，实现永久记忆。
+🛠 **Prepare to Start Development Environment**
+- Parse commands in `⚡ Quick Recovery`, infer if none (based on Makefile/package.json, etc.).
+- If parsing fails or no command can be inferred, prompt user: "No startup command detected, please manually start the development environment or update the ⚡ Quick Recovery section in PROGRESS.md."
+- If there is an inferred command, ask: "Execute `[inferred/extracted command]`?"
+- **Auto-writeback**: If user corrects the startup command, automatically update it to the `⚡ Quick Recovery` section of `PROGRESS.md` for permanent memory.
 
-🔄 **WIP 任务恢复**
-- 识别并列出所有 WIP 状态的任务
-- 提供快速恢复 WIP 环境的选项
+🔄 **WIP Task Recovery**
+- Identify and list all WIP status tasks
+- Provide options for quick WIP environment recovery
 ```

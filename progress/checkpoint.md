@@ -1,98 +1,98 @@
-# /progress checkpoint [备注]
+# /progress checkpoint [comment]
 
-## 指令
+## Command
 
-保存当前工作进度，智能选择暂存文件，更新 PROGRESS.md，并生成规范的 Git Commit。
+Save current work progress, intelligently select staging files, update PROGRESS.md, and generate a standardized Git commit.
 
-## 执行流程
+## Execution Flow
 
-### Step 1: 自动收集与分析
+### Step 1: Automatic Collection and Analysis
 
-- 读取 `PROGRESS.md` 当前内容。
-- 执行 `git status --short` 获取变更文件列表。
-- 执行 `git diff --stat` 了解改动范围。
-- 执行 `git log -5 --oneline` 学习历史提交风格。
-- 结合代码改动和用户输入的 [备注]，推断本次完成/进行中的任务，生成 Commit Message 草稿。
+- Read current content of `PROGRESS.md`.
+- Execute `git status --short` to get changed file list.
+- Execute `git diff --stat` to understand change scope.
+- Execute `git log -5 --oneline` to learn historical commit style.
+- Combine code changes and user input [comment] to infer completed/in-progress tasks, generate commit message draft.
 
-### Step 2: 合理性分析与确认
+### Step 2: Rationality Analysis and Confirmation
 
-- **改动分析**：若改动跨越多个不相关模块（如同时改了 auth 和 payment）或单文件改动超 200 行，提示用户："⚠️ 检测到改动范围较大/跨模块，建议拆分提交。是否拆分？"
-- **Commit Message 确认**：展示草稿，等待用户修改或确认。
-  - 规范：遵循 Conventional Commits (`type(scope): description`)。
-  - WIP：未完成的功能使用 `wip(scope): description` 格式。
-  - Skip CI：若用户输入包含 `--skip` 或 `#skip-ci`，在标题末尾追加 `[skip ci]`。
-  - Footer：所有 commit 末尾统一另起一行追加 `[checkpoint]` 标签。
+- **Change Analysis**: If changes span multiple unrelated modules (e.g., modified both auth and payment) or single file changes exceed 200 lines, prompt user: "⚠️ Detected large scope/cross-module changes,建议 split commit. Split?"
+- **Commit Message Confirmation**: Display draft, wait for user modification or confirmation.
+  - Standard: Follow Conventional Commits (`type(scope): description`).
+  - WIP: Use `wip(scope): description` format for incomplete features.
+  - Skip CI: If user input contains `--skip` or `#skip-ci`, append `[skip ci]` at the end of the title.
+  - Footer: All commits end with `[checkpoint]` tag on a new line.
 
-### Step 3: 智能文件选择
+### Step 3: Intelligent File Selection
 
-根据改动情况分支处理：
+Process based on change situation:
 
-**情况 A：改动小且干净（文件 ≤ 3 且无敏感文件）**
-- 自动暂存所有变更文件。
-- 静默进入 Step 4。
+**Case A: Small and clean changes (files ≤ 3 and no sensitive files)**
+- Automatically stage all changed files.
+- Silently proceed to Step 4.
 
-**情况 B：改动大或有可疑文件**
-- 展示**待提交文件预览面板**：
+**Case B: Large changes or suspicious files**
+- Display **pending commit file preview panel**:
   ```
-  ✅ **推荐提交** (3):
+  ✅ **Recommended Commit** (3):
     [1] src/api/gateway.py       (+45/-2)
     [2] src/tui/error.py         (+12/-0)
-  ⚠️ **建议排除** (检测到配置/日志文件):
-    [3] .env                     (未跟踪)
-    [4] debug.log                (未跟踪)
+  ⚠️ **Suggested Exclusion** (detected config/log files):
+    [3] .env                     (untracked)
+    [4] debug.log                (untracked)
   ```
-- 提示用户输入指令调整（如："排除 1"、"去掉 .env"、"全部提交"、"只提交 2"）。
-- 解析用户意图，构建最终的暂存文件列表。
+- Prompt user for adjustment instructions (e.g., "exclude 1", "remove .env", "commit all", "only commit 2").
+- Parse user intent, build final staging file list.
 
-### Step 4: 写入进度与提交
+### Step 4: Write Progress and Commit
 
-1. 在本地更新 `PROGRESS.md`：
-   - 更新头部时间 `> 最后更新: {CURRENT_DATE}`。
-   - 状态迁移：将本次完成的工作移至 ✅ 最近完成（只记日期不记 hash），若是 WIP 则保留在 🎯 并更新描述。
-   - 更新 📅 任务历史：添加当天的任务记录，按日期倒序排列。
-   - 清理：合并重复项，保证 ✅ 分区不超过 5 条，📅 任务历史保留最近 7 天。
-   - 更新 🏛️ 归档链接：添加指向归档文件的链接。
-2. 将更新后的 `PROGRESS.md` 写入磁盘。
-3. 执行 Git 操作：
-   - `git add <最终确认的文件> PROGRESS.md`
+1. Update `PROGRESS.md` locally:
+   - Update header time `> Last updated: {CURRENT_DATE}`.
+   - Status migration: Move completed work to ✅ Recently Completed (only record date, not hash), if WIP keep in 🎯 and update description.
+   - Update 📅 Task History: Add today's task records, sorted by date in descending order.
+   - Cleanup: Merge duplicates, ensure ✅ section has no more than 5 items, 📅 Task History keeps last 7 days.
+   - Update 🏛️ Archive Links: Add links to archive files.
+2. Write updated `PROGRESS.md` to disk.
+3. Execute Git operations:
+   - `git add <final confirmed files> PROGRESS.md`
    - `git commit -m "<confirmed_message>"`
-4. 触发归档操作：
-   - 调用 `/progress archive` 命令，自动归档超过 7 天的历史记录。
+4. Trigger archive operation:
+   - Call `/progress archive` command to automatically archive history records older than 7 days.
 
-## Commit Message 标准格式
+## Commit Message Standard Format
 
-**普通提交：**
+**Regular Commit:**
 ```
 <type>(<scope>): <subject>
 
-[可选正文]
+[optional body]
 
 [checkpoint]
 ```
 
-**WIP 提交：**
+**WIP Commit:**
 ```
 wip(<scope>): <subject>
 
-[可选正文]
+[optional body]
 
 [checkpoint]
 ```
 
-**跳过 CI 提交：**
+**Skip CI Commit:**
 ```
 <type>(<scope>): <subject> [skip ci]
 
-[可选正文]
+[optional body]
 
 [checkpoint]
 ```
 
-**WIP 且跳过 CI 提交：**
+**WIP and Skip CI Commit:**
 ```
 wip(<scope>): <subject> [skip ci]
 
-[可选正文]
+[optional body]
 
 [checkpoint]
 ```

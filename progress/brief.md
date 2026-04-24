@@ -1,73 +1,73 @@
 # /progress brief [daily|weekly] [--format=md|html|pdf]
 
-## 指令
+## Command
 
-生成项目开发日报或周报，包含任务完成情况、代码变更统计和进度趋势分析。
+Generate project development daily or weekly reports, including task completion status, code change statistics, and progress trend analysis.
 
-## 执行流程
+## Execution Flow
 
-### Step 1: 数据收集
+### Step 1: Data Collection
 
-- 读取 `PROGRESS.md` 中的 `📅 任务历史` 部分
-- 执行 `git log --since="1 day ago"` 或 `git log --since="1 week ago"` 获取提交历史
-- 执行 `git diff --stat` 分析代码变更
-- 解析 `✅ 最近完成` 和 `🎯 当前聚焦` 部分获取最新状态
+- Read `📅 Task History` section in `PROGRESS.md`
+- Execute `git log --since="1 day ago"` or `git log --since="1 week ago"` to get commit history
+- Execute `git diff --stat` to analyze code changes
+- Parse `✅ Recently Completed` and `🎯 Current Focus` sections to get latest status
 
-### Step 2: 报告生成
+### Step 2: Report Generation
 
-根据指定的格式生成报告：
+Generate reports according to the specified format:
 
-**Markdown 格式**：
-- 包含任务完成情况
-- 代码变更统计
-- 进度趋势分析
-- 下一步计划
+**Markdown Format**:
+- Include task completion status
+- Code change statistics
+- Progress trend analysis
+- Next steps plan
 
-**HTML 格式**：
-- 包含 Markdown 内容
-- 嵌入 Chart.js 生成代码活动和进度趋势图表
-- 响应式设计，支持移动端查看
+**HTML Format**:
+- Include Markdown content
+- Embed Chart.js to generate code activity and progress trend charts
+- Responsive design, support mobile viewing
 
-**PDF 格式**：
-- 基于 HTML 格式生成
-- 使用浏览器打印功能或 Pandoc 转换
+**PDF Format**:
+- Generated based on HTML format
+- Use browser print function or Pandoc conversion
 
-### Step 3: 输出与导出
+### Step 3: Output and Export
 
-- 默认输出到终端
-- 支持指定输出文件路径
-- 自动创建输出目录（如果不存在）
+- Default output to terminal
+- Support specifying output file path
+- Automatically create output directory (if it doesn't exist)
 
-## 命令选项
+## Command Options
 
-- `daily`：生成日报（默认）
-- `weekly`：生成周报
-- `--format=md`：输出 Markdown 格式（默认）
-- `--format=html`：输出 HTML 格式
-- `--format=pdf`：输出 PDF 格式
-- `--output=<path>`：指定输出文件路径
-- `--lang=zh`：使用中文生成报告
-- `--lang=en`：使用英文生成报告（默认）
+- `daily`：Generate daily report (default)
+- `weekly`：Generate weekly report
+- `--format=md`：Output Markdown format (default)
+- `--format=html`：Output HTML format
+- `--format=pdf`：Output PDF format
+- `--output=<path>`：Specify output file path
+- `--lang=zh`：Generate report in Chinese
+- `--lang=en`：Generate report in English (default)
 
-## 示例
+## Examples
 
 ```
-# 生成当日日报（Markdown 格式，自动检测语言）
+# Generate daily report (Markdown format, automatic language detection)
 /progress brief daily
 
-# 生成当周周报（HTML 格式，英文）
+# Generate weekly report (HTML format, English)
 /progress brief weekly --format=html --lang=en
 
-# 生成日报并导出到指定文件（中文）
+# Generate daily report and export to specified file (Chinese)
 /progress brief daily --format=pdf --lang=zh --output=./reports/daily_zh.pdf
 
-# 生成周报并导出到指定文件（英文）
+# Generate weekly report and export to specified file (English)
 /progress brief weekly --format=html --lang=en --output=./reports/weekly_en.html
 ```
 
-## 报告内容
+## Report Content
 
-**日报示例**：
+**Chinese Daily Report Example**:
 
 ```markdown
 # 项目日报 - 2026-04-24
@@ -94,7 +94,7 @@
 - 开始实现用户权限管理
 ```
 
-**周报示例**：
+**Chinese Weekly Report Example**:
 
 ```markdown
 # 项目周报 - 2026-04-18 至 2026-04-24
@@ -130,7 +130,7 @@
 - 开始测试阶段
 ```
 
-**英文日报示例**：
+**English Daily Report Example**:
 
 ```markdown
 # Project Daily Report - 2026-04-24
@@ -157,7 +157,7 @@
 - Start implementing user permission management
 ```
 
-**英文周报示例**：
+**English Weekly Report Example**:
 
 ```markdown
 # Project Weekly Report - 2026-04-18 to 2026-04-24

@@ -1,43 +1,43 @@
 # /progress archive
 
-## 指令
+## Command
 
-归档项目进度历史记录，将超过 7 天的任务历史移至归档目录，保持 PROGRESS.md 的合理大小。
+Archive project progress history records, move task history older than 7 days to archive directory, keep PROGRESS.md at a reasonable size.
 
-## 执行流程
+## Execution Flow
 
-### Step 1: 检测项目根目录
+### Step 1: Detect Project Root Directory
 
-- 从当前目录向上查找，直到找到包含 `.git` 或 `PROGRESS.md` 的目录作为项目根。
+- Search upward from the current directory until finding a directory containing `.git` or `PROGRESS.md` as the project root.
 
-### Step 2: 读取 PROGRESS.md
+### Step 2: Read PROGRESS.md
 
-- 读取 `PROGRESS.md` 文件内容
-- 解析 `📅 任务历史` 部分，提取日期和任务信息
+- Read `PROGRESS.md` file content
+- Parse `📅 Task History` section, extract date and task information
 
-### Step 3: 识别需要归档的记录
+### Step 3: Identify Records to Archive
 
-- 计算当前日期与每条历史记录的日期差
-- 识别超过 7 天的历史记录
+- Calculate date difference between current date and each history record
+- Identify records older than 7 days
 
-### Step 4: 创建归档目录结构
+### Step 4: Create Archive Directory Structure
 
-- 创建归档目录：`docs/progress/年份/月份/`
-- 计算当前是当月的第几周（按自然周计算，从当月 1 日开始为第 1 周）
-- 确定归档文件路径：`docs/progress/年份/月份/week_周数.md`
+- Create archive directory: `docs/progress/year/month/`
+- Calculate current week number of the month (calculated by natural week, starting from the 1st day of the month as week 1)
+- Determine archive file path: `docs/progress/year/month/week_weeknumber.md`
 
-### Step 5: 移动历史记录到归档文件
+### Step 5: Move History Records to Archive File
 
-- 将超过 7 天的历史记录移至对应周的归档文件
-- 更新 PROGRESS.md 中的 `📅 任务历史` 部分，只保留最近 7 天的记录
-- 更新 PROGRESS.md 中的 `🏛️ 归档链接` 部分，添加新的归档文件链接
+- Move records older than 7 days to corresponding week's archive file
+- Update `📅 Task History` section in PROGRESS.md, keep only last 7 days of records
+- Update `🏛️ Archive Links` section in PROGRESS.md, add new archive file links
 
-### Step 6: 提交归档文件
+### Step 6: Commit Archive Files
 
-- 执行 `git add` 添加归档文件和更新后的 PROGRESS.md
-- 执行 `git commit` 提交归档操作
+- Execute `git add` to add archive files and updated PROGRESS.md
+- Execute `git commit` to commit archive operation
 
-## 归档目录结构
+## Archive Directory Structure
 
 ```
 docs/
@@ -46,60 +46,60 @@ docs/
     │   ├── 04/
     │   │   ├── week_1.md
     │   │   ├── week_2.md
-    │   │   └── README.md  # 月度索引文件
+    │   │   └── README.md  # Monthly index file
     │   └── 05/
     │       ├── week_1.md
     │       └── README.md
-    └── README.md  # 年度索引文件
+    └── README.md  # Annual index file
 ```
 
-## 归档文件格式
+## Archive File Format
 
-**week_1.md 示例**：
+**week_1.md example**:
 
 ```markdown
-# 项目进度归档 - 2026-04-01 至 2026-04-07
+# Project Progress Archive - 2026-04-01 to 2026-04-07
 
 ## 2026-04-07
-- ✅ 完成：实现用户认证接口
-- 🔄 进行中：优化数据库查询性能
+- ✅ Completed: Implement user authentication API
+- 🔄 In Progress: Optimize database query performance
 
 ## 2026-04-06
-- ✅ 完成：设计数据库 schema
-- ✅ 完成：搭建项目基础架构
+- ✅ Completed: Design database schema
+- ✅ Completed: Set up project infrastructure
 
 ## 2026-04-05
-- ✅ 完成：初始化项目
-- 🔄 进行中：设计数据库 schema
+- ✅ Completed: Initialize project
+- 🔄 In Progress: Design database schema
 ```
 
-## 月度索引文件格式
+## Monthly Index File Format
 
-**README.md 示例**：
+**README.md example**:
 
 ```markdown
-# 2026年4月归档
+# 2026-April Archive
 
-## 周归档
-- [第一周](./week_1.md) - 2026-04-01 至 2026-04-07
-- [第二周](./week_2.md) - 2026-04-08 至 2026-04-14
-- [第三周](./week_3.md) - 2026-04-15 至 2026-04-21
-- [第四周](./week_4.md) - 2026-04-22 至 2026-04-28
+## Week Archives
+- [Week 1](./week_1.md) - 2026-04-01 to 2026-04-07
+- [Week 2](./week_2.md) - 2026-04-08 to 2026-04-14
+- [Week 3](./week_3.md) - 2026-04-15 to 2026-04-21
+- [Week 4](./week_4.md) - 2026-04-22 to 2026-04-28
 ```
 
-## 示例
+## Examples
 
 ```
-# 执行归档操作
+# Execute archive operation
 /progress archive
 
-# 查看归档文件
+# View archive files
 ls -la docs/progress/2026/04/
 ```
 
-## 注意事项
+## Notes
 
-1. **自动归档**：checkpoint 命令会自动触发归档操作，无需手动执行。
-2. **保留期限**：默认保留最近 7 天的历史记录，可通过配置文件修改。
-3. **目录创建**：如果归档目录不存在，会自动创建。
-4. **Git 提交**：归档操作会自动提交到 Git，确保历史记录的安全存储。
+1. **Automatic Archive**: checkpoint command automatically triggers archive operation, no need to execute manually.
+2. **Retention Period**: Default to keep last 7 days of history records, can be modified via configuration file.
+3. **Directory Creation**: If archive directory does not exist, it will be created automatically.
+4. **Git Commit**: Archive operation will be automatically committed to Git, ensuring safe storage of history records.
