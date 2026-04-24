@@ -16,7 +16,7 @@ Save current work progress, intelligently select staging files, update PROGRESS.
 
 ### Step 2: Rationality Analysis and Confirmation
 
-- **Change Analysis**: If changes span multiple unrelated modules (e.g., modified both auth and payment) or single file changes exceed 200 lines, prompt user: "⚠️ Detected large scope/cross-module changes,建议 split commit. Split?"
+- **Change Analysis**: If changes span multiple unrelated modules (e.g., modified both auth and payment) or single file changes exceed 200 lines, prompt user: "⚠️ Detected large scope/cross-module changes, suggest splitting commit. Split?"
 - **Commit Message Confirmation**: Display draft, wait for user modification or confirmation.
   - Standard: Follow Conventional Commits (`type(scope): description`).
   - WIP: Use `wip(scope): description` format for incomplete features.

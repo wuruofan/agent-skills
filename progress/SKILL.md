@@ -19,6 +19,8 @@ Track project development progress, enable cross-device work session saving and 
 1. **Project Root Detection**: Search upward from the current directory until finding a directory containing `.git` or `PROGRESS.md` as the project root.
 2. **File Path**: All operations target `PROGRESS.md` in the project root directory.
 3. **Language Following User**: Analyze commit history and user input to automatically detect language and generate content in the corresponding language. Support for manually specifying language via `--lang` parameter.
+   - **Detection Priority**: User input > Recent commit messages > System locale
+   - **Supported Languages**: English (en) and Chinese (zh)
 4. **If PROGRESS.md does not exist**:
    - Ask user: "Project progress tracking not detected. Would you like to initialize PROGRESS.md?"
    - After user confirmation, write the following standard structure directly in the project root directory:

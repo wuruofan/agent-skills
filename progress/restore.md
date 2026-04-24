@@ -10,7 +10,7 @@ Restore work session, sync remote progress, provide context recall, and start de
 
 - Execute `git status`.
 - **If local is dirty (has uncommitted changes)**:
-  - Output warning: "⚠️ Local has uncommitted changes,建议 first `/progress checkpoint` to handle."
+  - Output warning: "⚠️ Local has uncommitted changes, suggest first `/progress checkpoint` to handle."
   - Abort process, let user decide.
 
 ### Step 2: Check Remote Progress Updates
