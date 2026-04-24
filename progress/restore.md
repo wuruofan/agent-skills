@@ -6,12 +6,19 @@ Restore work session, sync remote progress, provide context recall, and start de
 
 ## Execution Flow
 
-### Step 1: Check Local Status
+### Step 1: Check Local Status and PROGRESS.md
 
 - Execute `git status`.
 - **If local is dirty (has uncommitted changes)**:
   - Output warning: "⚠️ Local has uncommitted changes, suggest first `/progress checkpoint` to handle."
   - Abort process, let user decide.
+- Check if `PROGRESS.md` exists:
+  - If it doesn't exist: Prompt user to initialize it (as per Global Rules)
+  - If it exists and old format detected:
+    - Create a backup: `PROGRESS.md.bak.<timestamp>`
+    - Convert old content to new structure
+    - Inform user: "PROGRESS.md has been upgraded to the new format. A backup has been created at PROGRESS.md.bak.<timestamp>."
+  - If already using new format: Proceed normally
 
 ### Step 2: Check Remote Progress Updates
 

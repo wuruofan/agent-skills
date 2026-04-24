@@ -10,7 +10,17 @@ Generate a summary of the current progress, including in-progress tasks, uncommi
 
 - Search upward from the current directory until finding a directory containing `.git` or `PROGRESS.md` as the project root.
 
-### Step 2: Collect Information
+### Step 2: Check and Process PROGRESS.md
+
+- Check if `PROGRESS.md` exists:
+  - If it doesn't exist: Prompt user to initialize it (as per Global Rules)
+  - If it exists and old format detected:
+    - Create a backup: `PROGRESS.md.bak.<timestamp>`
+    - Convert old content to new structure
+    - Inform user: "PROGRESS.md has been upgraded to the new format. A backup has been created at PROGRESS.md.bak.<timestamp>."
+  - If already using new format: Proceed normally
+
+### Step 3: Collect Information
 
 1. **Read PROGRESS.md**:
    - Extract `🎯 Current Focus` tasks
@@ -22,14 +32,14 @@ Generate a summary of the current progress, including in-progress tasks, uncommi
    - Execute `git diff --stat` to analyze code change statistics
    - Execute `git log -5 --oneline` to get recent commits
 
-### Step 3: Generate Summary
+### Step 4: Generate Summary
 
 - Consolidate information from PROGRESS.md and Git
 - Calculate code change statistics
 - Identify WIP tasks
 - Generate next steps suggestions
 
-### Step 4: Output Summary
+### Step 5: Output Summary
 
 - Output to terminal in text format
 - Automatically detect language based on user input and commit history
