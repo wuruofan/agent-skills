@@ -78,6 +78,18 @@ This scheme balances brevity with clarity, making the progress skill more user-f
    - Ask user: "Project progress tracking not detected. Would you like to initialize PROGRESS.md?"
    - After user confirmation, write the following standard structure directly in the project root directory:
 
+5. **If PROGRESS.md already exists**:
+   - Check if it's using the old format (not matching the standard structure above)
+   - If old format detected:
+     - Create a backup: `PROGRESS.md.bak.<timestamp>`
+     - Convert old content to the new structure where possible
+     - Preserve existing task information
+     - Write the updated content to PROGRESS.md
+     - Inform user: "PROGRESS.md has been upgraded to the new format. A backup has been created at PROGRESS.md.bak.<timestamp>."
+   - If already using the new format:
+     - Proceed normally
+     - No backup needed
+
 ```
 # Progress
 
@@ -96,7 +108,7 @@ This scheme balances brevity with clarity, making the progress skill more user-f
 <!-- Record sticking points for easy review -->
 
 ## 🧠 Context Notes
-<!-- Key decisions, API snippets, research conclusions -->
+<!-- Key decisions, API snippets, research conclusions, debug notes and error analysis -->
 
 ## ⚡ Quick Recovery
 - `git pull`

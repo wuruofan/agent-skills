@@ -6,7 +6,17 @@ Save current work progress, intelligently select staging files, update PROGRESS.
 
 ## Execution Flow
 
-### Step 1: Automatic Collection and Analysis
+### Step 1: Check and Process Existing PROGRESS.md
+
+- Check if `PROGRESS.md` exists:
+  - If it doesn't exist: Prompt user to initialize it (as per Global Rules)
+  - If it exists and old format detected:
+    - Create a backup: `PROGRESS.md.bak.<timestamp>`
+    - Convert old content to new structure
+    - Inform user: "PROGRESS.md has been upgraded to the new format. A backup has been created at PROGRESS.md.bak.<timestamp>."
+  - If already using new format: Proceed normally
+
+### Step 2: Automatic Collection and Analysis
 
 - Read current content of `PROGRESS.md`.
 - Execute `git status --short` to get changed file list.
@@ -14,7 +24,7 @@ Save current work progress, intelligently select staging files, update PROGRESS.
 - Execute `git log -5 --oneline` to learn historical commit style.
 - Combine code changes and user input [comment] to infer completed/in-progress tasks, generate commit message draft.
 
-### Step 2: Rationality Analysis and Confirmation
+### Step 3: Rationality Analysis and Confirmation
 
 - **Change Analysis**: If changes span multiple unrelated modules (e.g., modified both auth and payment) or single file changes exceed 200 lines, prompt user: "⚠️ Detected large scope/cross-module changes, suggest splitting commit. Split?"
 - **Commit Message Confirmation**: Display draft, wait for user modification or confirmation.
@@ -23,13 +33,13 @@ Save current work progress, intelligently select staging files, update PROGRESS.
   - Skip CI: If user input contains `--skip` or `#skip-ci`, append `[skip ci]` at the end of the title.
   - Footer: All commits end with `[checkpoint]` tag on a new line.
 
-### Step 3: Intelligent File Selection
+### Step 4: Intelligent File Selection
 
 Process based on change situation:
 
 **Case A: Small and clean changes (files ≤ 3 and no sensitive files)**
 - Automatically stage all changed files.
-- Silently proceed to Step 4.
+- Silently proceed to Step 5.
 
 **Case B: Large changes or suspicious files**
 - Display **pending commit file preview panel**:
@@ -44,7 +54,7 @@ Process based on change situation:
 - Prompt user for adjustment instructions (e.g., "exclude 1", "remove .env", "commit all", "only commit 2").
 - Parse user intent, build final staging file list.
 
-### Step 4: Write Progress and Commit
+### Step 5: Write Progress and Commit
 
 1. Update `PROGRESS.md` locally:
    - Update header time `> Last updated: {CURRENT_DATE}`.

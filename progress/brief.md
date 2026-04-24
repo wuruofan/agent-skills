@@ -6,14 +6,24 @@ Generate project development daily or weekly reports, including task completion 
 
 ## Execution Flow
 
-### Step 1: Data Collection
+### Step 1: Check and Process PROGRESS.md
+
+- Check if `PROGRESS.md` exists:
+  - If it doesn't exist: Prompt user to initialize it (as per Global Rules)
+  - If it exists and old format detected:
+    - Create a backup: `PROGRESS.md.bak.<timestamp>`
+    - Convert old content to new structure
+    - Inform user: "PROGRESS.md has been upgraded to the new format. A backup has been created at PROGRESS.md.bak.<timestamp>."
+  - If already using new format: Proceed normally
+
+### Step 2: Data Collection
 
 - Read `📅 Task History` section in `PROGRESS.md`
 - Execute `git log --since="1 day ago"` or `git log --since="1 week ago"` to get commit history
 - Execute `git diff --stat` to analyze code changes
 - Parse `✅ Recently Completed` and `🎯 Current Focus` sections to get latest status
 
-### Step 2: Report Generation
+### Step 3: Report Generation
 
 Generate reports according to the specified format:
 
@@ -32,7 +42,7 @@ Generate reports according to the specified format:
 - Generated based on HTML format
 - Use browser print function or Pandoc conversion
 
-### Step 3: Output and Export
+### Step 4: Output and Export
 
 - Default output to terminal
 - Support specifying output file path

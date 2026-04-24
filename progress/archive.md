@@ -10,29 +10,39 @@ Archive project progress history records, move task history older than 7 days to
 
 - Search upward from the current directory until finding a directory containing `.git` or `PROGRESS.md` as the project root.
 
-### Step 2: Read PROGRESS.md
+### Step 2: Check and Process PROGRESS.md
+
+- Check if `PROGRESS.md` exists:
+  - If it doesn't exist: Prompt user to initialize it (as per Global Rules)
+  - If it exists and old format detected:
+    - Create a backup: `PROGRESS.md.bak.<timestamp>`
+    - Convert old content to new structure
+    - Inform user: "PROGRESS.md has been upgraded to the new format. A backup has been created at PROGRESS.md.bak.<timestamp>."
+  - If already using new format: Proceed normally
+
+### Step 3: Read PROGRESS.md
 
 - Read `PROGRESS.md` file content
 - Parse `📅 Task History` section, extract date and task information
 
-### Step 3: Identify Records to Archive
+### Step 4: Identify Records to Archive
 
 - Calculate date difference between current date and each history record
 - Identify records older than 7 days
 
-### Step 4: Create Archive Directory Structure
+### Step 5: Create Archive Directory Structure
 
 - Create archive directory: `docs/progress/year/month/`
 - Calculate current week number of the month (calculated by natural week, starting from the 1st day of the month as week 1)
 - Determine archive file path: `docs/progress/year/month/week_weeknumber.md`
 
-### Step 5: Move History Records to Archive File
+### Step 6: Move History Records to Archive File
 
 - Move records older than 7 days to corresponding week's archive file
 - Update `📅 Task History` section in PROGRESS.md, keep only last 7 days of records
 - Update `🏛️ Archive Links` section in PROGRESS.md, add new archive file links
 
-### Step 6: Commit Archive Files
+### Step 7: Commit Archive Files
 
 - Execute `git add` to add archive files and updated PROGRESS.md
 - Execute `git commit` to commit archive operation
