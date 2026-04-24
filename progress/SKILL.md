@@ -1,16 +1,18 @@
 ---
 name: progress
-description: 项目开发进度追踪与工作现场恢复
-version: 1.0.0
+description: 项目开发进度追踪、工作现场恢复、日报周报生成与历史记录归档
+version: 1.1.0
 commands:
   - show
   - checkpoint
   - restore
+  - brief
+  - archive
 ---
 
 # Progress Skill
 
-追踪项目开发进度，实现跨设备的工作现场保存与恢复。
+追踪项目开发进度，实现跨设备的工作现场保存与恢复，自动生成日报周报，并管理历史记录归档。
 
 ## 全局规则
 
@@ -44,4 +46,10 @@ commands:
 ## ⚡ 快速恢复
 - `git pull`
 -
+
+## 📅 任务历史（最近 7 天）
+<!-- 自动生成，按日期倒序排列 -->
+
+## 🏛️ 归档链接
+<!-- 自动生成，指向历史归档文件 -->
 ```

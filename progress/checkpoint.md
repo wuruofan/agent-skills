@@ -19,7 +19,7 @@
 - **改动分析**：若改动跨越多个不相关模块（如同时改了 auth 和 payment）或单文件改动超 200 行，提示用户："⚠️ 检测到改动范围较大/跨模块，建议拆分提交。是否拆分？"
 - **Commit Message 确认**：展示草稿，等待用户修改或确认。
   - 规范：遵循 Conventional Commits (`type(scope): description`)。
-  - WIP：未完成的功能自动在 description 中体现 `wip` 状态。
+  - WIP：未完成的功能使用 `wip(scope): description` 格式。
   - Skip CI：若用户输入包含 `--skip` 或 `#skip-ci`，在标题末尾追加 `[skip ci]`。
   - Footer：所有 commit 末尾统一另起一行追加 `[checkpoint]` 标签。
 
@@ -49,11 +49,15 @@
 1. 在本地更新 `PROGRESS.md`：
    - 更新头部时间 `> 最后更新: {CURRENT_DATE}`。
    - 状态迁移：将本次完成的工作移至 ✅ 最近完成（只记日期不记 hash），若是 WIP 则保留在 🎯 并更新描述。
-   - 清理：合并重复项，保证 ✅ 分区不超过 5 条。
+   - 更新 📅 任务历史：添加当天的任务记录，按日期倒序排列。
+   - 清理：合并重复项，保证 ✅ 分区不超过 5 条，📅 任务历史保留最近 7 天。
+   - 更新 🏛️ 归档链接：添加指向归档文件的链接。
 2. 将更新后的 `PROGRESS.md` 写入磁盘。
 3. 执行 Git 操作：
    - `git add <最终确认的文件> PROGRESS.md`
    - `git commit -m "<confirmed_message>"`
+4. 触发归档操作：
+   - 调用 `/progress archive` 命令，自动归档超过 7 天的历史记录。
 
 ## Commit Message 标准格式
 
@@ -66,9 +70,27 @@
 [checkpoint]
 ```
 
+**WIP 提交：**
+```
+wip(<scope>): <subject>
+
+[可选正文]
+
+[checkpoint]
+```
+
 **跳过 CI 提交：**
 ```
 <type>(<scope>): <subject> [skip ci]
+
+[可选正文]
+
+[checkpoint]
+```
+
+**WIP 且跳过 CI 提交：**
+```
+wip(<scope>): <subject> [skip ci]
 
 [可选正文]
 
