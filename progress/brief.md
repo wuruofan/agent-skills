@@ -37,6 +37,7 @@ Generate reports according to the specified format:
 - Default output to terminal
 - Support specifying output file path
 - Automatically create output directory (if it doesn't exist)
+- Automatically detect language based on user input and commit history
 
 ## Command Options
 
@@ -46,8 +47,6 @@ Generate reports according to the specified format:
 - `--format=html`：Output HTML format
 - `--format=pdf`：Output PDF format
 - `--output=<path>`：Specify output file path
-- `--lang=zh`：Generate report in Chinese
-- `--lang=en`：Generate report in English (default)
 
 ## Examples
 
@@ -55,14 +54,14 @@ Generate reports according to the specified format:
 # Generate daily report (Markdown format, automatic language detection)
 /progress brief daily
 
-# Generate weekly report (HTML format, English)
-/progress brief weekly --format=html --lang=en
+# Generate weekly report (HTML format)
+/progress brief weekly --format=html
 
-# Generate daily report and export to specified file (Chinese)
-/progress brief daily --format=pdf --lang=zh --output=./reports/daily_zh.pdf
+# Generate daily report and export to specified file
+/progress brief daily --format=pdf --output=./reports/daily.pdf
 
-# Generate weekly report and export to specified file (English)
-/progress brief weekly --format=html --lang=en --output=./reports/weekly_en.html
+# Generate weekly report and export to specified file
+/progress brief weekly --format=html --output=./reports/weekly.html
 ```
 
 ## Report Content

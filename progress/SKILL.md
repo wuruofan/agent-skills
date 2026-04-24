@@ -1,7 +1,7 @@
 ---
 name: progress
-description: Project development progress tracking, work session recovery, daily/weekly report generation, and history archiving
-version: 1.2.0
+description: Project development progress tracking, work session recovery, daily/weekly report generation, history archiving, and current progress summaries
+version: 1.4.0
 commands:
   - show
   - checkpoint
@@ -13,7 +13,18 @@ commands:
 
 # Progress Skill
 
-Track project development progress, enable cross-device work session saving and recovery, automatically generate daily/weekly reports, and manage history archiving.
+Track project development progress, enable cross-device work session saving and recovery, automatically generate daily/weekly reports, manage history archiving, and provide current progress summaries.
+
+## Commands Overview
+
+| Command | Description | Use Case |
+|---------|-------------|----------|
+| `show` | Display a quick overview of project status from PROGRESS.md | Daily quick check of project status |
+| `checkpoint` | Save progress, update PROGRESS.md, and create a Git commit | Regularly save work progress |
+| `restore` | Recover work session and sync remote progress | Resume work on a new device |
+| `brief` | Generate daily/weekly reports with code change statistics | Generate periodic reports |
+| `archive` | Archive historical records older than 7 days | Maintain PROGRESS.md size |
+| `summary` | Generate a detailed summary of current progress including uncommitted changes | Get detailed current status without committing |
 
 ## Global Rules
 
