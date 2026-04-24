@@ -46,21 +46,23 @@
 - `--format=html`：输出 HTML 格式
 - `--format=pdf`：输出 PDF 格式
 - `--output=<path>`：指定输出文件路径
+- `--lang=zh`：使用中文生成报告
+- `--lang=en`：使用英文生成报告（默认）
 
 ## 示例
 
 ```
-# 生成当日日报（Markdown 格式）
+# 生成当日日报（Markdown 格式，自动检测语言）
 /progress brief daily
 
-# 生成当周周报（HTML 格式）
-/progress brief weekly --format=html
+# 生成当周周报（HTML 格式，英文）
+/progress brief weekly --format=html --lang=en
 
-# 生成日报并导出到指定文件
-/progress brief daily --format=pdf --output=./reports/daily.pdf
+# 生成日报并导出到指定文件（中文）
+/progress brief daily --format=pdf --lang=zh --output=./reports/daily_zh.pdf
 
-# 生成周报并导出到指定文件
-/progress brief weekly --format=html --output=./reports/weekly.html
+# 生成周报并导出到指定文件（英文）
+/progress brief weekly --format=html --lang=en --output=./reports/weekly_en.html
 ```
 
 ## 报告内容
@@ -126,4 +128,67 @@
 - 完成数据库查询优化
 - 实现用户权限管理
 - 开始测试阶段
+```
+
+**英文日报示例**：
+
+```markdown
+# Project Daily Report - 2026-04-24
+
+## Completed Tasks
+- ✅ Implement user authentication API
+- ✅ Fix login page bug
+
+## In Progress Tasks
+- 🔄 Optimize database query performance
+
+## Code Changes
+- Added: 120 lines
+- Deleted: 35 lines
+- Modified: 56 lines
+
+## Progress Trend
+- Today's completed: 2 items
+- This week's total: 8 items
+- This month's total: 25 items
+
+## Next Steps
+- Complete database query optimization
+- Start implementing user permission management
+```
+
+**英文周报示例**：
+
+```markdown
+# Project Weekly Report - 2026-04-18 to 2026-04-24
+
+## Completed Tasks
+- ✅ Implement user authentication API
+- ✅ Fix login page bug
+- ✅ Design database schema
+- ✅ Set up project infrastructure
+- ✅ Implement data export functionality
+
+## In Progress Tasks
+- 🔄 Optimize database query performance
+- 🔄 Implement user permission management
+
+## Code Changes
+- Added: 450 lines
+- Deleted: 120 lines
+- Modified: 230 lines
+
+## Progress Trend
+- This week's completed: 5 items
+- This month's total: 25 items
+- Project completion: 45%
+
+## Issues and Solutions
+- Database performance issue: Resolved by adding indexes and optimizing query statements
+- Frontend styling issue: Refactored layout using CSS Grid
+
+## Next Steps
+- Complete database query optimization
+- Implement user permission management
+- Start testing phase
 ```
