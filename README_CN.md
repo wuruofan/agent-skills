@@ -15,14 +15,19 @@ npx skills add wuruofan/agent-skills -g -y
 ### 安装特定技能
 
 ```bash
-# 仅安装 progress 技能
-npx skills add wuruofan/agent-skills --skill progress -g -y
+# 安装特定 progress 技能
+npx skills add wuruofan/agent-skills --skill progress-show -g -y
+npx skills add wuruofan/agent-skills --skill progress-checkpoint -g -y
+npx skills add wuruofan/agent-skills --skill progress-restore -g -y
+npx skills add wuruofan/agent-skills --skill progress-brief -g -y
+npx skills add wuruofan/agent-skills --skill progress-archive -g -y
+npx skills add wuruofan/agent-skills --skill progress-summary -g -y
 
-# 仅安装 web-fetch-as-markdown 技能
+# 安装 web-fetch-as-markdown 技能
 npx skills add wuruofan/agent-skills --skill web-fetch-as-markdown -g -y
 
 # 安装多个技能
-npx skills add wuruofan/agent-skills --skill progress --skill web-fetch-as-markdown -g -y
+npx skills add wuruofan/agent-skills --skill progress-show --skill progress-checkpoint -g -y
 ```
 
 ## 收录的 Skills
@@ -45,9 +50,20 @@ npx skills add wuruofan/agent-skills --skill progress --skill web-fetch-as-markd
 
 ---
 
-### progress
+### Progress 技能套件
 
 跟踪项目开发进度，支持跨设备工作会话保存和恢复，自动生成日报/周报，管理历史归档，并提供当前进度摘要。
+
+拆分为 6 个独立技能，以实现跨平台兼容：
+
+| 技能 | 描述 |
+|------|------|
+| `progress-show` | 显示项目状态概览 - 快速日常检查 |
+| `progress-checkpoint` | 保存进度，更新 PROGRESS.md，创建 Git 提交 |
+| `progress-restore` | 恢复工作会话，同步远程进度 |
+| `progress-brief` | 生成日报/周报，包含代码统计 |
+| `progress-archive` | 归档 7 天前的历史记录 |
+| `progress-summary` | 生成详细的当前进度摘要 |
 
 **使用场景：**
 - 跟踪项目开发进度
@@ -55,14 +71,6 @@ npx skills add wuruofan/agent-skills --skill progress --skill web-fetch-as-markd
 - 生成日报/周报
 - 归档历史记录
 - 获取当前进度摘要
-
-**命令：**
-- `show` (缩写: `s`) - 显示项目状态概览
-- `checkpoint` (缩写: `c`) - 保存进度并创建 Git 提交
-- `restore` (缩写: `r`) - 恢复工作会话
-- `brief` (缩写: `b`) - 生成日报/周报
-- `archive` (缩写: `a`) - 归档历史记录
-- `summary` (缩写: `sum`) - 生成当前进度摘要
 
 **触发词：** "跟踪进度"、"保存会话"、"生成报告"、"归档历史"、"检查状态"
 
