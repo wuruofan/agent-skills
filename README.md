@@ -15,14 +15,19 @@ npx skills add wuruofan/agent-skills -g -y
 ### Install specific skills
 
 ```bash
-# Install only progress skill
-npx skills add wuruofan/agent-skills --skill progress -g -y
+# Install specific progress skill
+npx skills add wuruofan/agent-skills --skill progress-show -g -y
+npx skills add wuruofan/agent-skills --skill progress-checkpoint -g -y
+npx skills add wuruofan/agent-skills --skill progress-restore -g -y
+npx skills add wuruofan/agent-skills --skill progress-brief -g -y
+npx skills add wuruofan/agent-skills --skill progress-archive -g -y
+npx skills add wuruofan/agent-skills --skill progress-summary -g -y
 
-# Install only web-fetch-as-markdown skill
+# Install web-fetch-as-markdown skill
 npx skills add wuruofan/agent-skills --skill web-fetch-as-markdown -g -y
 
 # Install multiple skills
-npx skills add wuruofan/agent-skills --skill progress --skill web-fetch-as-markdown -g -y
+npx skills add wuruofan/agent-skills --skill progress-show --skill progress-checkpoint -g -y
 ```
 
 ## Included Skills
@@ -45,9 +50,20 @@ Fetches any web URL and converts it to clean, structured Markdown — stripping 
 
 ---
 
-### progress
+### Progress Skills Suite
 
 Track project development progress, enable cross-device work session saving and recovery, automatically generate daily/weekly reports, manage history archiving, and provide current progress summaries.
+
+Split into 6 independent skills for cross-platform compatibility:
+
+| Skill | Description |
+|-------|-------------|
+| `progress-show` | Display project status overview - quick daily check |
+| `progress-checkpoint` | Save progress, update PROGRESS.md, create Git commit |
+| `progress-restore` | Restore work session, sync remote progress |
+| `progress-brief` | Generate daily/weekly reports with code statistics |
+| `progress-archive` | Archive history records older than 7 days |
+| `progress-summary` | Generate detailed current progress summary |
 
 **Use Cases:**
 - Track project development progress
@@ -55,14 +71,6 @@ Track project development progress, enable cross-device work session saving and 
 - Generate daily/weekly reports
 - Archive historical records
 - Get current progress summaries
-
-**Commands:**
-- `show` (abbreviation: `s`) - Display project status overview
-- `checkpoint` (abbreviation: `c`) - Save progress and create Git commit
-- `restore` (abbreviation: `r`) - Recover work session
-- `brief` (abbreviation: `b`) - Generate daily/weekly reports
-- `archive` (abbreviation: `a`) - Archive historical records
-- `summary` (abbreviation: `sum`) - Generate current progress summary
 
 **Trigger Words:** "track progress", "save session", "generate report", "archive history", "check status"
 
