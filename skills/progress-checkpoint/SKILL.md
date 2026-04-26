@@ -1,7 +1,7 @@
 ---
 name: progress-checkpoint
 description: Save work progress, update PROGRESS.md, and create Git commit - regularly save work with intelligent file selection
-version: 1.5.0
+version: 1.6.0
 ---
 
 # Progress Checkpoint
@@ -87,6 +87,15 @@ Process based on change situation:
    - Update header time `> Last updated: {CURRENT_DATE}`.
    - Status migration: Move completed work to ✅ Recently Completed (only record date, not hash), if WIP keep in 🎯 and update description.
    - Update 📅 Task History: Add today's task records, sorted by date in descending order.
+   - **Update ⚡ Quick Recovery with Key Files** (for easy restore navigation):
+     - Add key file paths to the `open:` line for quick access on restore
+     - **Selection criteria** (record only files matching these):
+       - Changes > 50 lines in a single file
+       - Core/entry-point modules (main, config, router)
+       - New files (new features/components)
+       - Files related to user-mentioned issues/bugs
+     - Keep concise (≤ 3 files), focus on files likely to need follow-up work
+     - Example: `- open: src/auth.py, config/settings.json`
    - Cleanup: Merge duplicates, ensure ✅ section has no more than 5 items, 📅 Task History keeps last 7 days.
    - Update 🏛️ Archive Links: Add links to archive files.
 2. Write updated `PROGRESS.md` to disk.
@@ -158,7 +167,7 @@ wip(<scope>): <subject> [skip ci]
 
 ## ⚡ Quick Recovery
 - `git pull`
--
+- open: <!-- Add key files to open on restore, e.g., "src/auth.py, src/user.js" -->
 
 ## 📅 Task History (Last 7 days)
 <!-- Automatically generated, sorted by date in descending order -->
