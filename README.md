@@ -63,7 +63,7 @@ Split into 6 independent skills for cross-platform compatibility:
 | `progress-restore` | Restore work session, sync remote progress |
 | `progress-brief` | Generate daily/weekly reports with code statistics |
 | `progress-archive` | Archive history records older than 7 days |
-| `progress-summary` | Generate detailed current progress summary |
+| `progress-summary` | Generate compact session summary for new session continuity |
 
 **Use Cases:**
 - Track project development progress

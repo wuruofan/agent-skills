@@ -63,7 +63,7 @@ npx skills add wuruofan/agent-skills --skill progress-show --skill progress-chec
 | `progress-restore` | 恢复工作会话，同步远程进度 |
 | `progress-brief` | 生成日报/周报，包含代码统计 |
 | `progress-archive` | 归档 7 天前的历史记录 |
-| `progress-summary` | 生成详细的当前进度摘要 |
+| `progress-summary` | 生成紧凑会话摘要，便于新建会话继续工作 |
 
 **使用场景：**
 - 跟踪项目开发进度

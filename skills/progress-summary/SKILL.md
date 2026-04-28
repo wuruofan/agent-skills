@@ -1,12 +1,12 @@
 ---
 name: progress-summary
-description: Generate detailed current progress summary including uncommitted changes and code statistics - get status without committing
-version: 1.5.0
+description: Generate compact session summary including project state and chat context for new session continuity
+version: 1.6.0
 ---
 
 # Progress Summary
 
-Generate a summary of the current progress, including in-progress tasks, uncommitted changes, and code change statistics, without performing a Git commit.
+Generate a compact summary combining project state from PROGRESS.md and current chat session context. Enables seamless new session continuity by capturing essential context without unnecessary verbosity.
 
 ## Global Rules
 
@@ -30,6 +30,13 @@ Generate a summary of the current progress, including in-progress tasks, uncommi
    - If already using the new format:
      - Proceed normally
      - No backup needed
+6. **Session Context Capture**: Capture essential chat session context without bloat:
+   - User intent and goals
+   - Key technical decisions made
+   - Errors encountered and resolutions
+   - Files modified and their purpose
+   - Keep concise (aim for ~500 tokens max)
+   - Format for easy copy-paste into new sessions
 
 ## Execution Flow
 
@@ -53,23 +60,35 @@ Generate a summary of the current progress, including in-progress tasks, uncommi
    - Extract `🎯 Current Focus` tasks
    - Extract `📥 Todo Queue` items
    - Extract `✅ Recently Completed` tasks
+   - Extract `🧠 Context Notes`
+   - Extract `🧱 Blockers & Issues`
 
 2. **Analyze Git Status**:
    - Execute `git status --short` to get uncommitted changes
    - Execute `git diff --stat` to analyze code change statistics
    - Execute `git log -5 --oneline` to get recent commits
 
+3. **Capture Chat Session Context**:
+   - Retrieve the current chat conversation history
+   - Extract key topics and discussion points
+   - Identify decisions made during the session
+   - Capture action items and follow-up tasks
+   - Summarize the conversation in a concise format for new session continuity
+
 ### Step 4: Generate Summary
 
-- Consolidate information from PROGRESS.md and Git
+- Consolidate information from PROGRESS.md, Git, and chat session
 - Calculate code change statistics
-- Identify WIP tasks
-- Generate next steps suggestions
+- Identify WIP tasks and current focus
+- Synthesize chat conversation into key points and decisions
+- Generate next steps suggestions based on combined context
 
 ### Step 5: Output Summary
 
 - Output to terminal in text format
+- Include comprehensive session context for new session continuity
 - Automatically detect language based on user input and commit history
+- Format output for easy copy-paste into new sessions
 
 ## Examples
 
@@ -81,33 +100,43 @@ Generate a summary of the current progress, including in-progress tasks, uncommi
 ## Output Example
 
 ```
-📊 Current Progress Summary
-==========================
+📊 Session Summary
+=================
 
 🎯 Current Focus:
 - Implement user authentication API (WIP)
-- Optimize database query performance
 
-📥 Todo Queue:
-- Fix login page bug
-- Design database schema
+📋 Session Context:
+- User Intent: Build secure authentication system
+- Key Decisions: JWT tokens, Redis session storage
+- Errors Fixed: JWT signing algorithm mismatch
+- Files Modified: src/api/auth.js, src/utils/db.js
 
-💻 Uncommitted Changes:
-- src/api/auth.js (+25/-5)
-- src/utils/db.js (+12/-2)
+🧱 Blockers:
+- Waiting for API design review
 
-📈 Code Changes:
-- Added: 37 lines
-- Deleted: 7 lines
-- Modified: 0 lines
+📥 Next Steps:
+1. Complete authentication API
+2. Add rate limiting middleware
 
-🔄 Recent Commits:
-- 5e721bf feat: add user authentication endpoint
-- 9a34cde fix: resolve database connection issue
+💻 Uncommitted: 2 files | +37/-7 lines
+```
 
-💡 Next Steps:
-- Complete user authentication API
-- Run tests before committing
+## Usage for New Session Continuity
+
+After running `/progress-summary`, you can use the output to quickly catch up in a new session:
+
+```
+# Start new session with context
+/new-session
+---
+📊 Session Summary for Continuity
+---
+🎯 Current Focus: Implement user authentication API (WIP), Optimize database query performance
+📥 Next Tasks: Fix login page bug, Design database schema
+💬 Key Decisions: JWT-based auth, Redis session storage, rate limiting needed
+💻 Changes: src/api/auth.js (+25/-5), src/utils/db.js (+12/-2)
+---
 ```
 
 ## Standard PROGRESS.md Structure
