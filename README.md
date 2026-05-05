@@ -15,11 +15,9 @@ npx skills add wuruofan/agent-skills -g -y
 ### Install specific skills
 
 ```bash
-# Install specific progress skill
-npx skills add wuruofan/agent-skills --skill progress-show -g -y
-npx skills add wuruofan/agent-skills --skill progress-checkpoint -g -y
+# Install progress skills
+npx skills add wuruofan/agent-skills --skill progress-save -g -y
 npx skills add wuruofan/agent-skills --skill progress-restore -g -y
-npx skills add wuruofan/agent-skills --skill progress-brief -g -y
 npx skills add wuruofan/agent-skills --skill progress-archive -g -y
 npx skills add wuruofan/agent-skills --skill progress-summary -g -y
 
@@ -27,7 +25,7 @@ npx skills add wuruofan/agent-skills --skill progress-summary -g -y
 npx skills add wuruofan/agent-skills --skill web-fetch-as-markdown -g -y
 
 # Install multiple skills
-npx skills add wuruofan/agent-skills --skill progress-show --skill progress-checkpoint -g -y
+npx skills add wuruofan/agent-skills --skill progress-save --skill progress-restore -g -y
 ```
 
 ## Included Skills
@@ -52,27 +50,36 @@ Fetches any web URL and converts it to clean, structured Markdown — stripping 
 
 ### Progress Skills Suite
 
-Track project development progress, enable cross-device work session saving and recovery, automatically generate daily/weekly reports, manage history archiving, and provide current progress summaries.
+Track project development progress, save and restore work sessions across devices, archive development history.
 
-Split into 6 independent skills for cross-platform compatibility:
+4 core skills:
 
-| Skill | Description |
-|-------|-------------|
-| `progress-show` | Display project status overview - quick daily check |
-| `progress-checkpoint` | Save progress, update PROGRESS.md, create Git commit |
-| `progress-restore` | Restore work session, sync remote progress |
-| `progress-brief` | Generate daily/weekly reports with code statistics |
-| `progress-archive` | Archive history records older than 7 days |
-| `progress-summary` | Generate compact session summary for new session continuity |
+| Skill | Purpose | When to Use |
+|-------|---------|-------------|
+| `progress-save` | Update PROGRESS.md | Before commit, stash, or switching branches |
+| `progress-restore` | Restore session context | After break, on new device, or after branch switch |
+| `progress-archive` | Archive history records | Periodic review of development history |
+| `progress-summary` | Generate session summary | Start new session to continue previous work |
 
-**Use Cases:**
-- Track project development progress
-- Save and recover work sessions across devices
-- Generate daily/weekly reports
-- Archive historical records
-- Get current progress summaries
+**Quick Decision Guide:**
+- About to commit? → `/progress-save`
+- Coming back to work? → `/progress-restore`
+- Want to review history? → `/progress-archive`
+- Continuing in new session? → `/progress-summary`
 
-**Trigger Words:** "track progress", "save session", "generate report", "archive history", "check status"
+**Recommended AGENTS.md Configuration:**
+
+```markdown
+## 开发进度追踪
+
+提交代码前：调用 `/progress-save` 更新 PROGRESS.md
+恢复工作时：调用 `/progress-restore` 恢复会话上下文
+大任务完成时：调用 `/progress-archive` 归档历史记录
+```
+
+This lets LLM autonomously trigger skills at appropriate times.
+
+**Note:** `/progress-save` will automatically detect completed major tasks and prompt archive suggestion when appropriate.
 
 ---
 

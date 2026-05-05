@@ -1,7 +1,7 @@
 ---
 name: progress-restore
-description: Restore work session, sync remote progress, provide context recall - resume work on a new device or after break
-version: 1.5.0
+description: Use when resuming work on a new device, after a break, or after switching branches - restores session context from PROGRESS.md
+version: 1.6.0
 ---
 
 # Progress Restore
@@ -19,17 +19,7 @@ Restore work session, sync remote progress, provide context recall, and start de
    - Ask user: "Project progress tracking not detected. Would you like to initialize PROGRESS.md?"
    - After user confirmation, write the following standard structure directly in the project root directory:
 
-5. **If PROGRESS.md already exists**:
-   - Check if it's using the old format (not matching the standard structure above)
-   - If old format detected:
-     - Create a backup: `PROGRESS.md.bak.<timestamp>`
-     - Convert old content to the new structure where possible
-     - Preserve existing task information
-     - Write the updated content to PROGRESS.md
-     - Inform user: "PROGRESS.md has been upgraded to the new format. A backup has been created at PROGRESS.md.bak.<timestamp>."
-   - If already using the new format:
-     - Proceed normally
-     - No backup needed
+5. **CRITICAL: Preserve Existing Format**: If PROGRESS.md already exists, preserve its structure. Only read and present content, never restructure.
 
 ## Execution Flow
 
@@ -41,11 +31,7 @@ Restore work session, sync remote progress, provide context recall, and start de
   - Abort process, let user decide.
 - Check if `PROGRESS.md` exists:
   - If it doesn't exist: Prompt user to initialize it (as per Global Rules)
-  - If it exists and old format detected:
-    - Create a backup: `PROGRESS.md.bak.<timestamp>`
-    - Convert old content to new structure
-    - Inform user: "PROGRESS.md has been upgraded to the new format. A backup has been created at PROGRESS.md.bak.<timestamp>."
-  - If already using new format: Proceed normally
+  - If it exists: Read and preserve its structure, proceed with content extraction
 
 ### Step 2: Check Remote Progress Updates
 
@@ -61,7 +47,7 @@ Restore work session, sync remote progress, provide context recall, and start de
 
 Read the following content to build recovery context:
 
-1. **`PROGRESS.md`**: Focus on 🎯, 📥, ⚡ sections, especially identify WIP status tasks.
+1. **`PROGRESS.md`**: Extract current focus, next steps, and recovery info from existing sections (preserve format, don't assume standard sections).
 2. **Recent commits**: `git log -3 --stat` (understand last exit position).
 3. **WIP task detection**: Analyze WIP tags in recent commits, identify incomplete features.
 4. **Latest design documents**:
@@ -81,54 +67,80 @@ Structured output context, and interactively start environment:
 - Changed files: <list>
 
 🎯 **Current Focus**
-- [Extracted from 🎯, specially marked WIP tasks]
+- [Extracted from PROGRESS.md current focus section]
 
 📥 **Next Steps**
-- [Extracted from 📥]
+- [Extracted from PROGRESS.md next steps section]
 
 💡 **Related Design Documents**
 - <file_path> (modified on <date>)
 
 🛠 **Prepare to Start Development Environment**
-- Parse commands in `⚡ Quick Recovery`, infer if none (based on Makefile/package.json, etc.).
-- If parsing fails or no command can be inferred, prompt user: "No startup command detected, please manually start the development environment or update the ⚡ Quick Recovery section in PROGRESS.md."
+- Parse recovery commands from PROGRESS.md (look for recovery/start sections).
+- If parsing fails or no command can be inferred, prompt user: "No startup command detected, please manually start the development environment."
 - If there is an inferred command, ask: "Execute `[inferred/extracted command]`?"
-- **Auto-writeback**: If user corrects the startup command, automatically update it to the `⚡ Quick Recovery` section of `PROGRESS.md` for permanent memory.
 
 🔄 **WIP Task Recovery**
 - Identify and list all WIP status tasks
 - Provide options for quick WIP environment recovery
 ```
 
-## Standard PROGRESS.md Structure
+## Standard PROGRESS.md Structure (Optional Reference)
 
-```
+This format is **optional reference only**. Projects can use any custom format:
+
+```markdown
 # Progress
 
 > Last updated: {CURRENT_DATE}
 
 ## 🎯 Current Focus
-<!-- Core tasks in progress, recommended no more than 2 -->
+<!-- Major task currently in progress, max 1-2 items -->
 
-## 📥 Todo Queue
-<!-- Next planned tasks -->
+## 📥 Next Phases
+<!-- Phases to do next -->
 
-## ✅ Recently Completed
-<!-- Keep only the last 3-5 items to avoid infinite file growth -->
+## ✅ Recently Completed Phases
+<!-- Last 2-3 completed phases -->
 
 ## 🧱 Blockers & Issues
-<!-- Record sticking points for easy review -->
+<!-- Problems encountered -->
 
 ## 🧠 Context Notes
-<!-- Key decisions, API snippets, research conclusions, debug notes and error analysis -->
+<!-- Key decisions, design doc links, code statistics -->
 
 ## ⚡ Quick Recovery
+<!-- Commands and key files for restore -->
 - `git pull`
--
-
-## 📅 Task History (Last 7 days)
-<!-- Automatically generated, sorted by date in descending order -->
+- open: <!-- Key files to open -->
 
 ## 🏛️ Archive Links
-<!-- Automatically generated, pointing to historical archive files -->
+<!-- Links to archived major tasks -->
 ```
+
+**Section Purpose:**
+
+| Section | Purpose | Used By |
+|---------|---------|---------|
+| `🎯 Current Focus` | In-progress major task | restore, save, summary |
+| `📥 Next Phases` | Planned phases | restore, save, summary |
+| `✅ Recently Completed Phases` | Completed phases | save, archive |
+| `🧱 Blockers & Issues` | Problems | restore |
+| `🧠 Context Notes` | Decisions, design docs | restore |
+| `⚡ Quick Recovery` | Restore commands | restore |
+| `🏛️ Archive Links` | Archived major tasks | archive |
+
+## Intelligent Section Detection
+
+When reading PROGRESS.md, detect sections by common patterns:
+
+| Content Type | Possible Section Names |
+|--------------|------------------------|
+| Current focus | `🎯`, `Current Focus`, `当前`, `Current` |
+| Next steps | `📥`, `Todo`, `下一步`, `Next`, `🔜` |
+| Recovery commands | `⚡`, `Quick Recovery`, `恢复`, `Recovery` |
+| Completed | `✅`, `Completed`, `已完成`, `Recently Completed` |
+| Issues | `🧱`, `Issues`, `问题`, `Blockers` |
+| Notes | `🧠`, `Notes`, `备注`, `Context` |
+
+Projects may use any naming convention - adapt extraction logic to match existing sections.
