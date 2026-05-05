@@ -52,22 +52,9 @@ Fetches any web URL and converts it to clean, structured Markdown — stripping 
 
 Track project development progress, save and restore work sessions across devices, archive development history.
 
-4 core skills:
+**第一步：配置 AGENTS.md（重要）**
 
-| Skill | Purpose | When to Use |
-|-------|---------|-------------|
-| `progress-save` | Update PROGRESS.md | Before commit, stash, or switching branches |
-| `progress-restore` | Restore session context | After break, on new device, or after branch switch |
-| `progress-archive` | Archive history records | Periodic review of development history |
-| `progress-summary` | Generate session summary | Start new session to continue previous work |
-
-**Quick Decision Guide:**
-- About to commit? → `/progress-save`
-- Coming back to work? → `/progress-restore`
-- Want to review history? → `/progress-archive`
-- Continuing in new session? → `/progress-summary`
-
-**Recommended AGENTS.md Configuration:**
+在项目的 AGENTS.md 添加以下规则，让 LLM 自动触发技能：
 
 ```markdown
 ## 开发进度追踪
@@ -77,9 +64,24 @@ Track project development progress, save and restore work sessions across device
 大任务完成时：调用 `/progress-archive` 归档历史记录
 ```
 
-This lets LLM autonomously trigger skills at appropriate times.
+配置后，LLM 会在合适时机自主调用技能，无需手动记忆。
 
-**Note:** `/progress-save` will automatically detect completed major tasks and prompt archive suggestion when appropriate.
+**4 个核心技能：**
+
+| Skill | Purpose | When to Use |
+|-------|---------|-------------|
+| `progress-save` | Update PROGRESS.md | Before commit, stash, or switching branches |
+| `progress-restore` | Restore session context | After break, on new device, or after branch switch |
+| `progress-archive` | Archive history records | Major task completed |
+| `progress-summary` | Generate session summary | Start new session to continue previous work |
+
+**Quick Decision Guide:**
+- About to commit? → `/progress-save`
+- Coming back to work? → `/progress-restore`
+- Major task done? → `/progress-archive`
+- Continuing in new session? → `/progress-summary`
+
+**自动化提示：** `/progress-save` 会检测已完成的大任务，自动提示归档建议。
 
 ---
 
