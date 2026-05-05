@@ -152,17 +152,18 @@ This standard format is provided as **reference only**. Projects can adopt it if
 
 ## Difference from Other Skills
 
-| Feature | progress-save | progress-checkpoint | progress-summary |
-|---------|---------------|---------------------|------------------|
-| Update PROGRESS.md | ✓ | ✓ | ✗ |
-| Git commit | ✗ | ✓ | ✗ |
-| File selection | ✗ | ✓ | ✗ |
-| Commit message | ✗ | ✓ | ✗ |
+| Feature | progress-save | progress-archive | progress-summary |
+|---------|---------------|------------------|------------------|
+| Update PROGRESS.md | ✓ | ✓ (remove completed) | ✗ |
+| Create archive files | ✗ | ✓ | ✗ |
+| Git operations | ✗ | Optional commit | ✗ |
 | Generate summary | ✗ | ✗ | ✓ |
-| User confirmation | ✗ | ✓ (interactive) | ✗ |
-| Preserve custom format | ✓ | ✓ | N/A |
+| Trigger detection | Archive suggestion | N/A | N/A |
 
-**When to use each:**
-- `progress-save`: Before git operations (commit/stash/checkout), automated via hook
-- `progress-checkpoint`: When you want intelligent file selection and commit assistance
-- `progress-summary`: End of session, generate compact summary for next session continuity
+**Trigger timing:**
+- Before `git commit`: Update progress before creating commit
+- Before `git stash`: Save current state before stashing
+- Before `git checkout`: Update before switching branches
+- Manual: User explicitly requests progress update
+
+See README for recommended AGENTS.md configuration to let LLM trigger this skill automatically.
