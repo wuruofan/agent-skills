@@ -52,21 +52,7 @@ npx skills add wuruofan/agent-skills --skill progress-save --skill progress-rest
 
 跟踪项目开发进度，跨设备保存和恢复工作会话，归档开发历史。
 
-**第一步：配置 AGENTS.md（重要）**
-
-在项目的 AGENTS.md 添加以下规则，让 LLM 自动触发技能：
-
-```markdown
-## 开发进度追踪
-
-提交代码前：调用 `/progress-save` 更新 PROGRESS.md
-恢复工作时：调用 `/progress-restore` 恢复会话上下文
-大任务完成时：调用 `/progress-archive` 归档历史记录
-```
-
-配置后，LLM 会在合适时机自主调用技能，无需手动记忆。
-
-**4 个核心技能：**
+4 个核心技能：
 
 | 技能 | 用途 | 使用时机 |
 |------|------|----------|
@@ -81,7 +67,19 @@ npx skills add wuruofan/agent-skills --skill progress-save --skill progress-rest
 - 大任务完成了？ → `/progress-archive`
 - 新会话继续工作？ → `/progress-summary`
 
-**自动化提示：** `/progress-save` 会检测已完成的大任务，自动提示归档建议。
+**推荐 AGENTS.md 配置：**
+
+```markdown
+## 开发进度追踪
+
+提交代码前：调用 `/progress-save` 更新 PROGRESS.md
+恢复工作时：调用 `/progress-restore` 恢复会话上下文
+大任务完成时：调用 `/progress-archive` 归档历史记录
+```
+
+让 LLM 在合适时机自主触发技能。
+
+**说明：** `/progress-save` 会自动检测已完成的大任务，并在合适时机提示归档建议。
 
 ---
 

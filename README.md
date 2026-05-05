@@ -52,21 +52,7 @@ Fetches any web URL and converts it to clean, structured Markdown — stripping 
 
 Track project development progress, save and restore work sessions across devices, archive development history.
 
-**第一步：配置 AGENTS.md（重要）**
-
-在项目的 AGENTS.md 添加以下规则，让 LLM 自动触发技能：
-
-```markdown
-## 开发进度追踪
-
-提交代码前：调用 `/progress-save` 更新 PROGRESS.md
-恢复工作时：调用 `/progress-restore` 恢复会话上下文
-大任务完成时：调用 `/progress-archive` 归档历史记录
-```
-
-配置后，LLM 会在合适时机自主调用技能，无需手动记忆。
-
-**4 个核心技能：**
+4 core skills:
 
 | Skill | Purpose | When to Use |
 |-------|---------|-------------|
@@ -81,7 +67,19 @@ Track project development progress, save and restore work sessions across device
 - Major task done? → `/progress-archive`
 - Continuing in new session? → `/progress-summary`
 
-**自动化提示：** `/progress-save` 会检测已完成的大任务，自动提示归档建议。
+**Recommended AGENTS.md Configuration:**
+
+```markdown
+## Progress Tracking
+
+Before commit: Call `/progress-save` to update PROGRESS.md
+When resuming work: Call `/progress-restore` to restore session context
+When major task completed: Call `/progress-archive` to archive history
+```
+
+This lets LLM autonomously trigger skills at appropriate times.
+
+**Note:** `/progress-save` will automatically detect completed major tasks and prompt archive suggestion when appropriate.
 
 ---
 
