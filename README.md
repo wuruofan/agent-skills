@@ -70,11 +70,12 @@ Track project development progress, save and restore work sessions across device
 **Recommended AGENTS.md Configuration:**
 
 ```markdown
-## Progress Tracking
+## Progress Tracking (Critical)
 
-Before commit: Call `/progress-save` to update PROGRESS.md
-When resuming work: Call `/progress-restore` to restore session context
-When major task completed: Call `/progress-archive` to archive history
+- Before commit: Call `/progress-save` to update PROGRESS.md
+- When resuming work: Call `/progress-restore` to restore session context
+- When major task completed: Call `/progress-archive` to archive history
+- Before new session: Call `/progress-summary` to get session context
 ```
 
 This lets LLM autonomously trigger skills at appropriate times.

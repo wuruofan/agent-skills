@@ -70,11 +70,12 @@ npx skills add wuruofan/agent-skills --skill progress-save --skill progress-rest
 **推荐 AGENTS.md 配置：**
 
 ```markdown
-## 开发进度追踪
+## 进度追踪 (重要)
 
-提交代码前：调用 `/progress-save` 更新 PROGRESS.md
-恢复工作时：调用 `/progress-restore` 恢复会话上下文
-大任务完成时：调用 `/progress-archive` 归档历史记录
+- 提交代码前：调用 `/progress-save` 更新 PROGRESS.md
+- 恢复工作时：调用 `/progress-restore` 恢复会话上下文
+- 大任务完成时：调用 `/progress-archive` 归档历史记录
+- 新会话前：调用 `/progress-summary` 获取会话上下文
 ```
 
 让 LLM 在合适时机自主触发技能。
