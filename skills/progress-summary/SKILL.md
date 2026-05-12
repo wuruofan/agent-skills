@@ -42,7 +42,8 @@ Detect sections by common patterns:
 | Content Type | Possible Section Names |
 |--------------|------------------------|
 | Current focus | `🎯`, `Current Focus`, `当前`, `Current` |
-| Next steps | `📥`, `Next Steps`, `下一步`, `Next`, `Todo` |
+| Next steps | `📥`, `Next Phases`, `Todo`, `下一步`, `Next` |
+| Paused tasks | `⏸️`, `Paused Tasks`, `暂停`, `Hold` |
 | Completed | `✅`, `Completed`, `已完成`, `Recently Completed` |
 | Recovery | `⚡`, `Quick Recovery`, `恢复`, `Recovery` |
 
@@ -114,6 +115,9 @@ Copy output and paste at start of new session
 ## 📥 Next Phases
 <!-- Phases to do next -->
 
+## ⏸️ Paused Tasks
+<!-- Tasks paused mid-way -->
+
 ## ✅ Recently Completed Phases
 <!-- Last 2-3 completed phases -->
 
@@ -138,6 +142,7 @@ Copy output and paste at start of new session
 |---------|---------|---------|
 | `🎯 Current Focus` | In-progress major task | restore, save, summary |
 | `📥 Next Phases` | Planned phases | restore, save, summary |
+| `⏸️ Paused Tasks` | Paused mid-way tasks | restore, save |
 | `✅ Recently Completed Phases` | Completed phases | save, archive |
 | `🧱 Blockers & Issues` | Problems | restore |
 | `🧠 Context Notes` | Decisions, design docs | restore |

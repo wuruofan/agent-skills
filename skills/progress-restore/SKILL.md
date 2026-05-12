@@ -81,6 +81,7 @@ When reading PROGRESS.md, detect sections by common patterns:
 |--------------|------------------------|
 | Current focus | `🎯`, `Current Focus`, `当前`, `Current` |
 | Next steps | `📥`, `Next Phases`, `Todo`, `下一步`, `Next` |
+| Paused tasks | `⏸️`, `Paused Tasks`, `暂停`, `Hold` |
 | Completed | `✅`, `Completed`, `已完成`, `Recently Completed` |
 | Blockers | `🧱`, `Blockers`, `Issues`, `问题` |
 | Notes | `🧠`, `Context Notes`, `Notes`, `备注`, `Context` |
@@ -100,6 +101,9 @@ Projects may use any naming convention - adapt extraction logic to match existin
 
 ## 📥 Next Phases
 <!-- Phases to do next -->
+
+## ⏸️ Paused Tasks
+<!-- Tasks paused mid-way -->
 
 ## ✅ Recently Completed Phases
 <!-- Last 2-3 completed phases -->

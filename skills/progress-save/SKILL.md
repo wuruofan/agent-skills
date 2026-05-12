@@ -54,11 +54,12 @@ Based on existing PROGRESS.md structure, find appropriate sections for updates:
 | Content Type | Possible Section Names (examples) |
 |--------------|-----------------------------------|
 | Last update time | `> Last updated`, `> 最后更新` |
-| Completed tasks | `✅`, `已完成`, `Completed`, `Recently Completed` |
-| In-progress tasks | `🎯`, `Current`, `当前`, `In Progress` |
-| Next steps | `📥`, `Todo`, `下一步`, `Next` |
-| Issues/Blockers | `🧱`, `Issues`, `问题`, `Blockers` |
-| Notes | `🧠`, `Notes`, `备注`, `Context` |
+| Current focus | `🎯`, `Current Focus`, `当前`, `Current` |
+| Next steps | `📥`, `Next Phases`, `Todo`, `下一步`, `Next` |
+| Paused tasks | `⏸️`, `Paused Tasks`, `暂停`, `Hold` |
+| Completed tasks | `✅`, `Completed`, `已完成`, `Recently Completed` |
+| Issues/Blockers | `🧱`, `Blockers`, `Issues`, `问题` |
+| Notes | `🧠`, `Context Notes`, `Notes`, `备注`, `Context` |
 
 **Matching logic:**
 1. Search for section names matching content type patterns
@@ -120,6 +121,9 @@ This standard format is provided as **reference only**. Projects can adopt it if
 ## 📥 Next Phases
 <!-- Phases to do next -->
 
+## ⏸️ Paused Tasks
+<!-- Tasks paused mid-way, with completion %, blockers, and entry points -->
+
 ## ✅ Recently Completed Phases
 <!-- Last 2-3 completed phases, archive when major task done -->
 
@@ -144,6 +148,7 @@ This standard format is provided as **reference only**. Projects can adopt it if
 |---------|---------|---------|
 | `🎯 Current Focus` | In-progress major task | restore, save, summary |
 | `📥 Next Phases` | Planned phases | restore, save, summary |
+| `⏸️ Paused Tasks` | Paused mid-way tasks | restore, save (track paused state) |
 | `✅ Recently Completed Phases` | Completed phases (max 2-3) | save, archive (detects completion) |
 | `🧱 Blockers & Issues` | Problems | restore (quick reference) |
 | `🧠 Context Notes` | Decisions, design docs | restore (context recall) |
