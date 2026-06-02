@@ -72,10 +72,17 @@ Track project development progress, save and restore work sessions across device
 ```markdown
 ## Progress Tracking (Critical)
 
-- Before commit: Call `/progress-save` to update PROGRESS.md
-- When resuming work: Call `/progress-restore` to restore session context
-- When major task completed: Call `/progress-archive` to archive history
-- Before new session: Call `/progress-summary` to get session context
+### Situation-based triggers
+- Before commit/stash/PR: Call `/progress-save` to update PROGRESS.md
+- When resuming work after a break: Call `/progress-restore` to restore session context
+- When a major task or all its phases are finished: Call `/progress-archive` to archive history
+- When starting a new session to continue previous work: Call `/progress-summary` to get session context
+
+### User-phrase triggers (defense-in-depth)
+- User says "update/save/record PROGRESS.md", "更新进度", "保存进度", "记录进度" → `/progress-save`
+- User says "restore/resume/load context", "恢复进度", "接着干", "继续上次", "之前干到哪了" → `/progress-restore`
+- User says "archive/clean up", "归档", "任务完成", "进度太长" → `/progress-archive`
+- User says "summarize/recap/handoff", "总结一下", "会话总结", "交接", "写个摘要" → `/progress-summary`
 ```
 
 This lets LLM autonomously trigger skills at appropriate times.

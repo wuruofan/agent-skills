@@ -1,7 +1,7 @@
 ---
 name: progress-summary
-description: Use when starting a new session to continue previous work - generates compact summary for session continuity
-version: 1.7.0
+description: Use when starting a new session, handing off to another session, or when context is getting long and user asks for a summary, recap, or handoff (生成总结, 会话总结, 总结一下, 上下文回顾, 接着上次干, 交接, 写个摘要)
+version: 1.8.0
 ---
 
 # Progress Summary

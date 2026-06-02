@@ -1,7 +1,7 @@
 ---
 name: progress-save
-description: Use when committing, stashing, or before switching branches - updates PROGRESS.md to record current work state without git operations
-version: 1.1.0
+description: Use when user asks to update, save, record, or write to PROGRESS.md (更新进度, 保存进度, 记录进度, 更新 PROGRESS.md), or before git commit/stash/checkout/PR/push, or at end of work session
+version: 1.2.0
 ---
 
 # Progress Save

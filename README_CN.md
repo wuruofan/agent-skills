@@ -72,10 +72,17 @@ npx skills add wuruofan/agent-skills --skill progress-save --skill progress-rest
 ```markdown
 ## 进度追踪 (重要)
 
-- 提交代码前：调用 `/progress-save` 更新 PROGRESS.md
-- 恢复工作时：调用 `/progress-restore` 恢复会话上下文
-- 大任务完成时：调用 `/progress-archive` 归档历史记录
-- 新会话前：调用 `/progress-summary` 获取会话上下文
+### 场景触发
+- 提交/stash/PR 前：调用 `/progress-save` 更新 PROGRESS.md
+- 休息后恢复工作：调用 `/progress-restore` 恢复会话上下文
+- 大任务或所有阶段完成时：调用 `/progress-archive` 归档历史记录
+- 新会话继续之前工作：调用 `/progress-summary` 获取会话上下文
+
+### 用户说法触发（防御性补充）
+- 用户说"update/save/record PROGRESS.md"、"更新进度"、"保存进度"、"记录进度" → `/progress-save`
+- 用户说"restore/resume/load context"、"恢复进度"、"接着干"、"继续上次"、"之前干到哪了" → `/progress-restore`
+- 用户说"archive/clean up"、"归档"、"任务完成"、"进度太长" → `/progress-archive`
+- 用户说"summarize/recap/handoff"、"总结一下"、"会话总结"、"交接"、"写个摘要" → `/progress-summary`
 ```
 
 让 LLM 在合适时机自主触发技能。
