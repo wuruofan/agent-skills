@@ -1,7 +1,7 @@
 ---
 name: progress-restore
-description: Use when resuming work on a new device, after a break, or after switching branches - restores session context from PROGRESS.md
-version: 1.7.0
+description: Use when resuming work after a break, on a new device, in a new session, after switching branches, or when user asks to read, load, or restore context (恢复进度, 接着干, 继续上次, 加载进度, 读取进度, 之前干到哪了)
+version: 1.8.0
 ---
 
 # Progress Restore

@@ -1,7 +1,7 @@
 ---
 name: progress-archive
-description: Use when a major task is complete (all phases finished) - archives completed task to history files, keeps PROGRESS.md concise
-version: 1.7.0
+description: Use when a major task or all its phases are finished, when PROGRESS.md grows too long, or when user asks to archive, clean up, or move completed work to history (归档, 归档进度, 清理已完成, 任务完成, 进度太长, 收尾)
+version: 1.8.0
 ---
 
 # Progress Archive
