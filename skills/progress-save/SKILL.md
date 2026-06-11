@@ -39,6 +39,15 @@ Projects may have custom PROGRESS.md structures tailored to their needs. The ski
 
 ## Execution Flow
 
+### Step 0: Conflict State Pre-check (NEW)
+
+- Execute `git diff --name-only --diff-filter=U` to detect unmerged files
+- If PROGRESS.md is in unmerged state OR contains `<<<<<<<` markers:
+    Output: "PROGRESS.md is in merge conflict state. Use /progress-merge
+             to resolve, then re-run /progress-save."
+    Halt execution (do not proceed to Step 1-5)
+- Otherwise: proceed to Step 1
+
 ### Step 1: Collect Context
 
 - Read current `PROGRESS.md` content.
@@ -60,6 +69,8 @@ Based on existing PROGRESS.md structure, find appropriate sections for updates:
 | Completed tasks | `✅`, `Completed`, `已完成`, `Recently Completed` |
 | Issues/Blockers | `🧱`, `Blockers`, `Issues`, `问题` |
 | Notes | `🧠`, `Context Notes`, `Notes`, `备注`, `Context` |
+| Recovery | `⚡`, `Quick Recovery`, `恢复`, `Recovery` |
+| Archive Links | `🏛️`, `Archive Links`, `归档`, `Archive` |
 
 **Matching logic:**
 1. Search for section names matching content type patterns
@@ -157,13 +168,14 @@ This standard format is provided as **reference only**. Projects can adopt it if
 
 ## Difference from Other Skills
 
-| Feature | progress-save | progress-archive | progress-summary |
-|---------|---------------|------------------|------------------|
-| Update PROGRESS.md | ✓ | ✓ (remove completed) | ✗ |
-| Create archive files | ✗ | ✓ | ✗ |
-| Git operations | ✗ | Optional commit | ✗ |
-| Generate summary | ✗ | ✗ | ✓ |
-| Trigger detection | Archive suggestion | N/A | N/A |
+| Feature | progress-save | progress-archive | progress-summary | progress-merge |
+|---------|---------------|------------------|------------------|----------------|
+| Update PROGRESS.md | ✓ | ✓ (remove completed) | ✗ | ✓ (merge conflicts) |
+| Create archive files | ✗ | ✓ | ✗ | ✗ |
+| Git operations | ✗ | Optional commit | ✗ | Optional `git add` |
+| Generate summary | ✗ | ✗ | ✓ | ✗ |
+| Trigger detection | Archive suggestion, **Merge redirect** | N/A | N/A | N/A |
+| Resolves PROGRESS.md conflicts | ✗ | ✗ | ✗ | ✓ |
 
 **Trigger timing:**
 - Before `git commit`: Update progress before creating commit

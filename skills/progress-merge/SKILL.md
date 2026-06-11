@@ -1,0 +1,324 @@
+---
+name: progress-merge
+description: Use when PROGRESS.md has merge conflicts (after `git merge` / `git rebase` / `git cherry-pick` involving PROGRESS.md), or when user wants to compare/merge progress state between two branches (合并 PROGRESS 冲突, merge progress across branches, 两个分支的 PROGRESS 怎么合, PROGRESS conflict 怎么解决, 解决 progress 冲突, dry-run compare branches)
+version: 1.0.0
+---
+
+# Progress Merge
+
+Merge PROGRESS.md across two git branches semantically. Use during merge conflicts on PROGRESS.md, or for comparing progress state between branches.
+
+## Global Rules
+
+1. **Project Root Detection**: Search upward from current directory until finding a directory containing `.git` or `PROGRESS.md`.
+2. **File Path**: All operations target `PROGRESS.md` in project root.
+3. **Language Following User**: Analyze commit history and user input to auto-detect language.
+   - **Detection Priority**: User input > Recent commit messages > System locale
+   - **Supported Languages**: English (en) and Chinese (zh)
+4. **If PROGRESS.md does not exist on either side**: Do NOT initialize (merge is not the right place for that). Instead:
+   - Both sides missing → exit and direct user to `/progress-save`
+   - One side missing → propose degenerate merge (take the other side as-is); user confirms before write
+5. **CRITICAL: Preserve Existing Format**: Never restructure either side's section naming style; output follows ours (or user-chosen side).
+6. **Sequencing Awareness**: see "Sequencing Awareness" section below.
+
+## Execution Modes
+
+### Mode A: Conflict Resolution
+
+Triggered by:
+- explicit `/progress-merge` while git index has PROGRESS.md as `UU`
+- `/progress-save` sentinel redirect
+
+Input: `git show :2:PROGRESS.md` + `git show :3:PROGRESS.md`.
+**CRITICAL — stage mapping depends on git mode**: in `git rebase` the stage 2/3 semantics are REVERSED vs `git merge`. Always run Step 0 (detect mode via `<GITDIR>/MERGE_HEAD` / `rebase-merge/` / `CHERRY_PICK_HEAD`) FIRST to determine which stage is "ours" and which is "theirs".
+
+| Trigger | `:2:` = | `:3:` = | User's "ours" | User's "theirs" |
+|---|---|---|---|---|
+| `git merge X` | HEAD | X | `:2:` | `:3:` |
+| `git rebase X` | X (base) | feature | **`:3:`** (reversed!) | **`:2:`** (reversed!) |
+| `git cherry-pick X` | HEAD | X commit | `:2:` | `:3:` (narrow scope) |
+
+### Mode C: Compare (Dry-run)
+
+Triggered by:
+- `/progress-merge --compare <ref1> <ref2>`
+- `/progress-merge --compare <path1> <path2>` (non-git inputs)
+
+Input: read from two refs or two file paths.
+
+## Execution Flow
+
+### Step 0: Mode Detection + Sequencing Check (Mode A only)
+
+**Step 0a**: Get real git directory (worktree compat):
+```
+git rev-parse --git-dir
+```
+Store result as `<GITDIR>`. Use `<GITDIR>/...` instead of `.git/...` in all subsequent commands.
+
+**Step 0b**: Detect git mode (run sequentially, first match wins):
+
+| # | Command | If exit code 0 | Mode |
+|---|---|---|---|
+| 1 | `test -d <GITDIR>/rebase-merge` | rebase (interactive/merge) | rebase |
+| 2 | `test -d <GITDIR>/rebase-apply` | rebase (apply) | rebase |
+| 3 | `test -f <GITDIR>/CHERRY_PICK_HEAD` | cherry-pick | cherry-pick |
+| 4 | `test -f <GITDIR>/MERGE_HEAD` | merge | merge |
+| 5 | all failed | not in conflict | → §11 "no conflict context" |
+
+**Step 0c**: Sequencing check — if other unmerged files exist besides PROGRESS.md, surface warning (see Sequencing Awareness Layer 2).
+
+### Step 1: Read Both Sides
+
+Read ours and theirs versions per Step 0's mode mapping. Also record working tree PROGRESS.md content hash for concurrency check in Step 7.
+
+### Step 2: Parse (Section + Task granularity)
+
+Identify sections using the detection table below, then parse tasks within each section.
+
+### Step 3: Collect Git Context
+
+```bash
+# Core: relative diffs
+git log --oneline -20 OURS..THEIRS
+git log --oneline -20 THEIRS..OURS
+
+# Fork point + time anchors
+git merge-base OURS THEIRS
+git log -1 --format='%H %ai %s' OURS
+git log -1 --format='%H %ai %s' THEIRS
+```
+
+OURS/THEIRS are branch refs (not stage numbers). Map per mode:
+
+| Mode | `OURS` ref | `THEIRS` ref |
+|---|---|---|
+| merge | `git symbolic-ref --short HEAD` | `cat <GITDIR>/MERGE_HEAD` |
+| rebase | `cat <GITDIR>/rebase-merge/head-name` | `cat <GITDIR>/rebase-merge/onto` |
+| cherry-pick | `git symbolic-ref --short HEAD` | `cat <GITDIR>/CHERRY_PICK_HEAD` |
+
+For display: convert full refs to short names via `git symbolic-ref --short <ref>`.
+
+### Step 4: Apply Merge Strategy Table
+
+### Step 5: Heuristic Arbitration (Batched AskUserQuestion)
+
+### Step 6: Preview
+
+### Step 7: Write + Optional `git add` (Mode A only)
+
+Before writing, re-read working tree PROGRESS.md and compare hash with Step 1. If changed externally, abort and prompt user to re-run.
+
+## Merge Strategy Table
+
+| Section | Default Strategy | Notes |
+|---|---|---|
+| `> Last updated` | **max** | Take newer time |
+| `🎯 Current Focus` | **Ask user** | Options: keep ours / theirs / both (annotate source) / rewrite |
+| `📥 Next Phases` | **union + task dedup** | Uncertain tasks → keep both, don't ask (plans are low-stakes) |
+| `⏸️ Paused Tasks` | **union** | Paused tasks should survive across branches |
+| `✅ Recently Completed` | **union + time sort + cap N** | N = `max(ours count, theirs count, 3)`; truncate oldest if over N |
+| `🧱 Blockers & Issues` | **union + dedup** | Never lose a blocker |
+| `🧠 Context Notes` | **union (append)** | Notes: more is better |
+| `⚡ Quick Recovery` | **union + annotate source** | Theirs items marked `[from <branch>]` |
+| `🏛️ Archive Links` | **union** | Pure links, safest |
+
+## Section Detection Table
+
+| Content Type | Possible Section Names |
+|---|---|
+| Last updated time | `> Last updated`, `> 最后更新` |
+| Current focus | `🎯`, `Current Focus`, `当前`, `Current` |
+| Next steps | `📥`, `Next Phases`, `Todo`, `下一步`, `Next` |
+| Paused tasks | `⏸️`, `Paused Tasks`, `暂停`, `Hold` |
+| Completed | `✅`, `Completed`, `已完成`, `Recently Completed` |
+| Blockers | `🧱`, `Blockers`, `Issues`, `问题` |
+| Notes | `🧠`, `Context Notes`, `Notes`, `备注`, `Context` |
+| Recovery | `⚡`, `Quick Recovery`, `恢复`, `Recovery` |
+| Archive Links | `🏛️`, `Archive Links`, `归档`, `Archive` |
+
+If both sides use different section naming styles → add to "must-ask" queue.
+
+## Task-Level Merge Rules
+
+### Task Parsing Heuristics
+
+| Format | Detection Rule | Example |
+|---|---|---|
+| Checkbox | Line starts with `- [ ]` / `- [x]` / `* [ ]` / `* [x]` | `- [x] Implement OAuth` |
+| Bullet | Line starts with `-` / `*` / `+` (no checkbox) | `- Fix trigger words` |
+| Sub-heading | `###` / `####` with `:` or status marker | `### Phase 4.1: Tools Module ✅` |
+| Numbered | Line starts with `1.` / `2.` | `1. Rewrite runtime` |
+
+**Sub-heading task body boundary**: from heading line until the first of:
+1. Next same-level heading (e.g., next `###`)
+2. Higher-level heading (e.g., `##` or `#`)
+3. `---` horizontal rule (common visual separator)
+4. End of file
+
+Entire body (paragraphs, bullets, code blocks) participates in merge as one unit. No nested decomposition.
+
+**Task attributes**:
+- **Title** = text after removing prefix markers, checkboxes, status emojis
+- **Status** = inferred from marker (`[x]`/`✅` = done, `[ ]` = pending, `⏸️` = paused, `(WIP)`/`(进行中)` = in_progress, else pending)
+- **Sub-items** = subsequent indented bullet/checkbox lines
+- **Description** = non-task-structural text after title line
+
+### "Same task?" Judgment (3 tiers)
+
+1. **Clearly same** (normalized identical or semantically equivalent) → auto-merge
+2. **Uncertain** (semantically similar but ambiguous) → must-ask queue
+3. **Clearly different** (semantically unrelated) → keep both
+
+**Hard constraint**: LLM MUST push uncertain cases to must-ask queue, never decide alone.
+
+**Exception**: In `Next Phases`, uncertain tasks default to "keep both" without asking — plans are low-stakes.
+
+### Same-task Content Arbitration
+
+| Field | Rule |
+|---|---|
+| Status | Take higher completion (done > in_progress > pending) |
+| Description | If semantically different → must-ask queue; if highly similar → take longer |
+| Sub-items | union + dedup |
+| Timestamp | max |
+
+### Status Completion Order
+
+**Clear**: `pending < in_progress < ✅ done`
+
+**Gray zone**: `⏸️ paused` vs `in_progress`/`pending` — paused may mean "80% done then paused" or "barely started then paused":
+- If paused item has progress description → LLM judges from description
+- If cannot judge from description → must-ask queue
+- `✅ done` always wins over paused
+
+## Heuristic Arbitration & Recommendation
+
+### Must-ask Scenarios
+
+1. Current Focus both non-empty and different
+2. Same-name task status conflict that cannot auto-resolve (including paused gray zone)
+3. Task name LLM judges as "uncertain if same" (except in Next Phases)
+4. Section naming style difference
+
+### Batching Rules
+
+- ≤ 4 must-ask scenarios → one AskUserQuestion call
+- > 4 → batch by priority (Current Focus first), ≤ 4 per batch
+  - Header format: `X/Y·<Type>` if batches ≤ 9; `X/Y` if > 9
+  - Type abbreviations: `CF` / `Task` / `Name` / `Sect`
+- No ambiguity → skip questions, go straight to preview
+
+### Recommendation Design
+
+- First option = recommended, append `(Recommended)` to label
+- Each option's `description` = one-line reasoning based on git context + status priority
+
+### Task Keyword Extraction (for git log grep)
+
+1. Remove status markers (✅ / ⏸️ / `(WIP)` etc.)
+2. Remove leading sequence numbers (`Phase 4.1:`, `1.`, `- [ ]`)
+3. Remove emojis
+4. **Prefer English/code tokens**: camelCase, hyphenated, underscored, plain English words
+5. If ≥ 1 English/code token → take first 1–2 as keyword
+6. If 0 English/code tokens (pure Chinese) → take first 1–2 Chinese words
+7. Fallback: if keyword grep returns empty → re-search with full task name
+
+## Large File Budget
+
+If either side > 500 lines:
+- **Core sections** (Current Focus / Next Phases / Paused Tasks / Recently Completed / **Blockers**) → full task-level parsing
+- **Secondary sections** (Context Notes / Quick Recovery / Archive Links) → section-level union only
+- If > 1000 lines → suggest `/progress-archive` first (non-blocking)
+
+## Sequencing Awareness
+
+**Layer 1 (Constraint on AI)**: When AI executes `git merge` / `git rebase` / `git cherry-pick`, follow AGENTS.md sequencing rule: resolve non-PROGRESS.md conflicts FIRST, then call /progress-merge.
+
+**Layer 2 (Pre-check, addressed to user)**: If /progress-merge is invoked while other unmerged files exist, surface a warning via AskUserQuestion. AI presents "pause and resolve code first" as recommended option, but user makes final decision.
+
+**Layer 3 (Cautionary note, addressed to user)**: If user opts to continue, embed a cautionary note in the preview so user knows the merged PROGRESS.md is based on a partially-resolved state.
+
+## Interaction Patterns
+
+### Preview
+
+Show (a) change summary + (b) full PROGRESS.md preview.
+
+If merged result > 300 lines → show section-level diff summary only (not full file).
+
+### Confirm (Mode A)
+
+Single AskUserQuestion with 4 options:
+1. Write + git add (Recommended)
+2. Write only (keep unmerged)
+3. Revise (back to preview, max 3 times)
+4. Cancel
+
+On 4th revision attempt, option 3 disappears.
+
+**Concurrency check**: Before writing, re-read working tree PROGRESS.md and compare with Step 1 hash. If changed → abort, prompt re-run.
+
+### Mode C Close
+
+No write questions. Output guidance for next steps (use Mode A for actual merge, etc.)
+
+## Error Handling
+
+| Error | Handling |
+|---|---|
+| PROGRESS.md missing on one side | Ask "take the other side (degenerate merge)?" |
+| Both sides missing | Exit, direct to `/progress-save` |
+| Not in git repo (except dry-run with absolute paths) | Error and exit |
+| Not in unmerged state but user calls `/progress-merge` | Enter "compare" mode: ask user for both sources |
+| In unmerged state but PROGRESS.md not in conflict list | Skip, tell user nothing to do |
+| Parse failure (non-markdown / blank / binary) | Error and exit, suggest manual fix |
+| User selects "Other" free text in batch questions | Insert raw content into corresponding section |
+| User selects "Cancel" after preview | No write, git state unchanged |
+| `git add` fails (permissions/lock) | File written, tell user manual `git add` |
+| Other unmerged files exist | §9.2 Layer 2 flow: soft warn + user decides |
+| `<<<<<<<` markers but git not in unmerged state | Offer: ① manual cleanup ② Mode C compare ③ cancel |
+
+## Difference from Other Skills
+
+| Feature | save | restore | archive | summary | **merge** |
+|---|---|---|---|---|---|
+| Writes to disk | ✓ | ✗ | ✓ | ✗ | ✓ |
+| Git read depth | shallow | medium | ✗ | shallow | **deepest** |
+| Executes git changes | ✗ | ✗ | optional commit | ✗ | **optional `git add`** |
+| Sentinel redirect | → archive, **→ merge** | ✗ | ✗ | ✗ | ✗ |
+| Resolves PROGRESS.md conflicts | ✗ | ✗ | ✗ | ✗ | ✓ (exclusive) |
+
+## Standard PROGRESS.md Structure (Optional Reference)
+
+```markdown
+# Progress
+
+> Last updated: {CURRENT_DATE}
+
+## 🎯 Current Focus
+<!-- Major task currently in progress, max 1-2 items -->
+
+## 📥 Next Phases
+<!-- Phases to do next -->
+
+## ⏸️ Paused Tasks
+<!-- Tasks paused mid-way, with completion %, blockers, and entry points -->
+
+## ✅ Recently Completed Phases
+<!-- Last 2-3 completed phases, archive when major task done -->
+
+## 🧱 Blockers & Issues
+<!-- Problems encountered -->
+
+## 🧠 Context Notes
+<!-- Key decisions, design doc links, code statistics -->
+
+## ⚡ Quick Recovery
+<!-- Commands and key files for restore -->
+- `git pull`
+- open: <!-- Key files to open -->
+
+## 🏛️ Archive Links
+<!-- Links to archived major tasks -->
+```
