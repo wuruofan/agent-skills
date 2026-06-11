@@ -145,24 +145,14 @@ If both sides use different section naming styles → add to "must-ask" queue.
 
 | Format | Detection Rule | Example |
 |---|---|---|
-| Checkbox | Line starts with `- [ ]` / `- [x]` / `* [ ]` / `* [x]` | `- [x] Implement OAuth` |
-| Bullet | Line starts with `-` / `*` / `+` (no checkbox) | `- Fix trigger words` |
+| Checkbox | `- [ ]` / `- [x]` / `* [ ]` / `* [x]` | `- [x] Implement OAuth` |
+| Bullet | `-` / `*` / `+` (no checkbox) | `- Fix trigger words` |
 | Sub-heading | `###` / `####` with `:` or status marker | `### Phase 4.1: Tools Module ✅` |
-| Numbered | Line starts with `1.` / `2.` | `1. Rewrite runtime` |
+| Numbered | `1.` / `2.` | `1. Rewrite runtime` |
 
-**Sub-heading task body boundary**: from heading line until the first of:
-1. Next same-level heading (e.g., next `###`)
-2. Higher-level heading (e.g., `##` or `#`)
-3. `---` horizontal rule (common visual separator)
-4. End of file
+**Sub-heading body** = heading line → next same-level heading / higher-level heading / `---` / EOF. Entire body merges as one unit (no nested decomposition).
 
-Entire body (paragraphs, bullets, code blocks) participates in merge as one unit. No nested decomposition.
-
-**Task attributes**:
-- **Title** = text after removing prefix markers, checkboxes, status emojis
-- **Status** = inferred from marker (`[x]`/`✅` = done, `[ ]` = pending, `⏸️` = paused, `(WIP)`/`(进行中)` = in_progress, else pending)
-- **Sub-items** = subsequent indented bullet/checkbox lines
-- **Description** = non-task-structural text after title line
+**Task attributes**: Title (strip markers/checkboxes/emojis) · Status (`[x]`/`✅`=done, `[ ]`=pending, `⏸️`=paused, `(WIP)`=in_progress) · Sub-items (indented bullets) · Description (non-structural text after title)
 
 ### "Same task?" Judgment (3 tiers)
 
@@ -288,37 +278,3 @@ No write questions. Output guidance for next steps (use Mode A for actual merge,
 | Executes git changes | ✗ | ✗ | optional commit | ✗ | **optional `git add`** |
 | Sentinel redirect | → archive, **→ merge** | ✗ | ✗ | ✗ | ✗ |
 | Resolves PROGRESS.md conflicts | ✗ | ✗ | ✗ | ✗ | ✓ (exclusive) |
-
-## Standard PROGRESS.md Structure (Optional Reference)
-
-```markdown
-# Progress
-
-> Last updated: {CURRENT_DATE}
-
-## 🎯 Current Focus
-<!-- Major task currently in progress, max 1-2 items -->
-
-## 📥 Next Phases
-<!-- Phases to do next -->
-
-## ⏸️ Paused Tasks
-<!-- Tasks paused mid-way, with completion %, blockers, and entry points -->
-
-## ✅ Recently Completed Phases
-<!-- Last 2-3 completed phases, archive when major task done -->
-
-## 🧱 Blockers & Issues
-<!-- Problems encountered -->
-
-## 🧠 Context Notes
-<!-- Key decisions, design doc links, code statistics -->
-
-## ⚡ Quick Recovery
-<!-- Commands and key files for restore -->
-- `git pull`
-- open: <!-- Key files to open -->
-
-## 🏛️ Archive Links
-<!-- Links to archived major tasks -->
-```
