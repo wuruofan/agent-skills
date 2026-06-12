@@ -93,17 +93,25 @@ Update content while preserving the exact structure:
 - Merge duplicates
 - Do NOT add new sections unless explicitly needed
 
-### Step 4: Detect Completed Major Tasks
+### Step 4: Detect Archive Needs
 
-After updating content, check for completed major tasks:
+After updating content, check two conditions (in priority order):
 
-**Detection criteria:**
+**Condition A — Major task completion (higher priority):**
 - Major task section header contains ✅ or "已完成" marker
-- All phases/subtasks under this major task are marked completed
+- All phases/subtasks under this task are marked completed
 - Task is in "Recently Completed" section (not "Current Focus")
 
-**If detected:**
-Prompt user: "Task '[Task Name]' appears complete with all phases finished. Archive it with `/progress-archive` to preserve history and keep PROGRESS.md concise?"
+**If A detected:**
+Prompt user: "Task '[Task Name]' appears complete. Archive it with `/progress-archive`?"
+- If PROGRESS.md also > 300 lines or Recently Completed > 5 items, append: "Also: PROGRESS.md is getting long — consider trimming after archiving."
+
+**Condition B — Bloat without completed major task:**
+- No completed major task detected, BUT:
+- PROGRESS.md > 300 lines, OR Recently Completed > 5 items
+
+**If B detected:**
+Output (non-blocking): "PROGRESS.md 已有 N 行 / Recently Completed 有 N 条。Run `/progress-archive` (trim mode) to archive overflow completed items."
 
 **Example detection:**
 ```
@@ -112,18 +120,12 @@ Prompt user: "Task '[Task Name]' appears complete with all phases finished. Arch
 ### Phase 2: ✅
 ### Phase 4.1: ✅
 ...
-→ All phases complete → Prompt archive suggestion
+→ All phases complete → Prompt archive suggestion (Condition A)
 ```
 
 ### Step 5: Write to Disk
 
 Write updated content preserving exact structure and formatting style.
-
-### Step 6: Bloat Detection
-
-After writing, check PROGRESS.md line count:
-- If > 300 lines → output (non-blocking): "PROGRESS.md 已有 N 行，建议：/progress-archive 归档已完成的大任务，或 /progress-archive 清理已完成项堆积"
-- If Recently Completed has > 5 items → append: "Recently Completed 已有 N 条，建议 /progress-archive 清理早期已完成项"
 
 ## Reference Standard Format (Optional)
 

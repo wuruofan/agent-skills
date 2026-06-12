@@ -22,7 +22,7 @@ Archive an entire completed major task (all phases ✅) to a standalone file.
 
 Triggered by: "清理", "精简", "trim", "太长了", "堆积", "进度太长", or when save bloat detection triggers.
 
-Lightweight cleanup: trim Recently Completed to recent 2-3 items, remove fixed Blockers, archive overflow items to a monthly trim file. Does NOT require a major task to be fully complete.
+Lightweight cleanup: trim Recently Completed to recent 2-3 items, archive overflow to a monthly trim file. Does NOT require a major task to be fully complete. Next Phases / Blockers cleanup is handled automatically by /progress-save.
 
 ## Global Rules
 
@@ -166,15 +166,13 @@ Update `docs/progress/archive/README.md`:
 
 - Read full content
 - Count items in Recently Completed
-- Identify fixed Blockers/Known Issues (marked ✅ fixed)
-- Identify completed items in Next Phases (marked ✅)
+- (Next Phases / Blockers cleanup already done by /progress-save; skip here)
 
 #### Step 2: Identify Items to Trim
 
-**Trim targets:**
-- Recently Completed: keep only the most recent 2-3 items, archive the rest
-- Blockers / Known Issues: remove items marked ✅ fixed (no archive needed — commit history has the record)
-- Next Phases: remove items marked ✅ (they belong in Recently Completed, not here)
+**Trim target:** Recently Completed only.
+- Keep only the most recent 2-3 items, archive the rest.
+- Blockers / Next Phases are NOT handled here — /progress-save cleans them automatically.
 
 **Ask user confirmation:**
 "Recently Completed has N items. Trim to 3 most recent? (Older items archived to `docs/progress/archive/trim-YYYY-MM.md`)"
@@ -202,8 +200,6 @@ If trimming Recently Completed overflow:
 #### Step 4: Update PROGRESS.md
 
 - Remove trimmed items from Recently Completed
-- Remove fixed Blockers/Known Issues
-- Remove ✅ items from Next Phases
 - Update Archive Links section with trim file reference
 
 #### Step 5: Update Archive Index

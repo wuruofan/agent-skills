@@ -34,6 +34,7 @@ Read the following sections (detect section names intelligently):
 4. **Blockers & Issues**: Any problems encountered
 5. **Context Notes**: Key decisions, design doc links
 6. **Quick Recovery**: Commands and key files to open
+7. **Archive Links**: Links to archived major tasks
 
 ### Step 3: Collect Additional Context
 

@@ -22,7 +22,7 @@ Generate a compact summary combining project state from PROGRESS.md and current 
 
 ### Step 1: Collect Context
 
-1. **Read PROGRESS.md**: Extract current focus, next steps, completed tasks (detect section names intelligently).
+1. **Read PROGRESS.md**: Extract all sections — current focus, next steps, completed tasks, paused tasks, blockers, context notes, archive links (detect section names intelligently).
 
 2. **Analyze Git Status**:
    - Execute `git status --short` to get uncommitted changes
