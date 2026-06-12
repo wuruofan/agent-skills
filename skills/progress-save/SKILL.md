@@ -87,6 +87,8 @@ Update content while preserving the exact structure:
 4. **Key files**: If there's a "恢复" or "Recovery" section, add key file paths.
 
 **Cleanup rules:**
+- **Next Phases**: Remove items marked ✅ (they belong in Recently Completed)
+- **Blockers / Known Issues**: Remove items marked ✅ fixed (commit history has the record)
 - Trim oversized sections only if project format expects it
 - Merge duplicates
 - Do NOT add new sections unless explicitly needed
@@ -116,6 +118,12 @@ Prompt user: "Task '[Task Name]' appears complete with all phases finished. Arch
 ### Step 5: Write to Disk
 
 Write updated content preserving exact structure and formatting style.
+
+### Step 6: Bloat Detection
+
+After writing, check PROGRESS.md line count:
+- If > 300 lines → output (non-blocking): "PROGRESS.md 已有 N 行，建议：/progress-archive 归档已完成的大任务，或 /progress-archive 清理已完成项堆积"
+- If Recently Completed has > 5 items → append: "Recently Completed 已有 N 条，建议 /progress-archive 清理早期已完成项"
 
 ## Reference Standard Format (Optional)
 

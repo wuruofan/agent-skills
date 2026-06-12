@@ -95,7 +95,7 @@ When AI executes `git merge` / `git rebase` / `git cherry-pick` and conflicts ar
 ### User-phrase triggers (defense-in-depth)
 - User says "update/save/record PROGRESS.md", "更新进度", "保存进度", "记录进度" → `/progress-save`
 - User says "restore/resume/load context", "恢复进度", "接着干", "继续上次", "之前干到哪了" → `/progress-restore`
-- User says "archive/clean up", "归档", "任务完成", "进度太长" → `/progress-archive`
+- User says "archive/clean up/trim", "归档", "任务完成", "进度太长", "清理", "精简" → `/progress-archive`
 - User says "summarize/recap/handoff", "总结一下", "会话总结", "交接", "写个摘要" → `/progress-summary`
 - User says "merge progress", "合并进度", "PROGRESS 冲突", "两个分支的 PROGRESS 怎么合" → `/progress-merge`
 ```

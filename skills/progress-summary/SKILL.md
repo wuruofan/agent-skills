@@ -33,7 +33,7 @@ Generate a compact summary combining project state from PROGRESS.md and current 
    - Key decisions made
    - Errors encountered and resolutions
    - Files modified and their purpose
-   - Keep concise (~500 tokens max)
+   - Keep concise (≤ 800 tokens, prioritize decisions and errors over verbose descriptions)
 
 ### Step 2: Intelligent Section Detection
 
@@ -41,11 +41,15 @@ Detect sections by common patterns:
 
 | Content Type | Possible Section Names |
 |--------------|------------------------|
+| Last updated time | `> Last updated`, `> 最后更新` |
 | Current focus | `🎯`, `Current Focus`, `当前`, `Current` |
 | Next steps | `📥`, `Next Phases`, `Todo`, `下一步`, `Next` |
 | Paused tasks | `⏸️`, `Paused Tasks`, `暂停`, `Hold` |
 | Completed | `✅`, `Completed`, `已完成`, `Recently Completed` |
+| Blockers | `🧱`, `Blockers`, `Issues`, `问题` |
+| Notes | `🧠`, `Context Notes`, `Notes`, `备注`, `Context` |
 | Recovery | `⚡`, `Quick Recovery`, `恢复`, `Recovery` |
+| Archive Links | `🏛️`, `Archive Links`, `归档`, `Archive` |
 
 ### Step 3: Generate Summary
 
@@ -101,50 +105,3 @@ Copy output and paste at start of new session
 
 💻 Uncommitted: 2 files | +37/-7 lines
 ```
-
-## Standard PROGRESS.md Structure (Optional Reference)
-
-```markdown
-# Progress
-
-> Last updated: {CURRENT_DATE}
-
-## 🎯 Current Focus
-<!-- Major task currently in progress, max 1-2 items -->
-
-## 📥 Next Phases
-<!-- Phases to do next -->
-
-## ⏸️ Paused Tasks
-<!-- Tasks paused mid-way -->
-
-## ✅ Recently Completed Phases
-<!-- Last 2-3 completed phases -->
-
-## 🧱 Blockers & Issues
-<!-- Problems encountered -->
-
-## 🧠 Context Notes
-<!-- Key decisions, design doc links, code statistics -->
-
-## ⚡ Quick Recovery
-<!-- Commands and key files for restore -->
-- `git pull`
-- open: <!-- Key files to open -->
-
-## 🏛️ Archive Links
-<!-- Links to archived major tasks -->
-```
-
-**Section Purpose:**
-
-| Section | Purpose | Used By |
-|---------|---------|---------|
-| `🎯 Current Focus` | In-progress major task | restore, save, summary |
-| `📥 Next Phases` | Planned phases | restore, save, summary |
-| `⏸️ Paused Tasks` | Paused mid-way tasks | restore, save |
-| `✅ Recently Completed Phases` | Completed phases | save, archive |
-| `🧱 Blockers & Issues` | Problems | restore |
-| `🧠 Context Notes` | Decisions, design docs | restore |
-| `⚡ Quick Recovery` | Restore commands | restore |
-| `🏛️ Archive Links` | Archived major tasks | archive |

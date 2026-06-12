@@ -69,6 +69,9 @@ Read the following sections (detect section names intelligently):
 - Commands: [Extracted from PROGRESS.md]
 - Key files: [Extracted from PROGRESS.md open: section]
 
+🏛️ Archive Links
+- [Extracted from PROGRESS.md, if any]
+
 💡 Related Design Documents
 - <file_path> (modified on <date>)
 ```
@@ -79,6 +82,7 @@ When reading PROGRESS.md, detect sections by common patterns:
 
 | Content Type | Possible Section Names |
 |--------------|------------------------|
+| Last updated time | `> Last updated`, `> 最后更新` |
 | Current focus | `🎯`, `Current Focus`, `当前`, `Current` |
 | Next steps | `📥`, `Next Phases`, `Todo`, `下一步`, `Next` |
 | Paused tasks | `⏸️`, `Paused Tasks`, `暂停`, `Hold` |
@@ -86,39 +90,6 @@ When reading PROGRESS.md, detect sections by common patterns:
 | Blockers | `🧱`, `Blockers`, `Issues`, `问题` |
 | Notes | `🧠`, `Context Notes`, `Notes`, `备注`, `Context` |
 | Recovery | `⚡`, `Quick Recovery`, `恢复`, `Recovery` |
+| Archive Links | `🏛️`, `Archive Links`, `归档`, `Archive` |
 
 Projects may use any naming convention - adapt extraction logic to match existing sections.
-
-## Standard PROGRESS.md Structure (Optional Reference)
-
-```markdown
-# Progress
-
-> Last updated: {CURRENT_DATE}
-
-## 🎯 Current Focus
-<!-- Major task currently in progress -->
-
-## 📥 Next Phases
-<!-- Phases to do next -->
-
-## ⏸️ Paused Tasks
-<!-- Tasks paused mid-way -->
-
-## ✅ Recently Completed Phases
-<!-- Last 2-3 completed phases -->
-
-## 🧱 Blockers & Issues
-<!-- Problems encountered -->
-
-## 🧠 Context Notes
-<!-- Key decisions, design doc links -->
-
-## ⚡ Quick Recovery
-<!-- Commands and key files for restore -->
-- `git pull`
-- open: <!-- Key files to open -->
-
-## 🏛️ Archive Links
-<!-- Links to archived major tasks -->
-```
