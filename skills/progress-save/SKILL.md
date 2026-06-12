@@ -1,7 +1,7 @@
 ---
 name: progress-save
 description: Use when user asks to update, save, record, or write to PROGRESS.md (更新进度, 保存进度, 记录进度, 更新 PROGRESS.md), or before git commit/stash/checkout/PR/push, or at end of work session
-version: 1.2.0
+version: 1.3.0
 ---
 
 # Progress Save
@@ -60,14 +60,14 @@ Projects may have custom PROGRESS.md structures tailored to their needs. The ski
 
 Based on existing PROGRESS.md structure, find appropriate sections for updates:
 
-| Content Type | Possible Section Names (examples) |
-|--------------|-----------------------------------|
-| Last update time | `> Last updated`, `> 最后更新` |
+| Content Type | Possible Section Names |
+|--------------|------------------------|
+| Last updated time | `> Last updated`, `> 最后更新` |
 | Current focus | `🎯`, `Current Focus`, `当前`, `Current` |
 | Next steps | `📥`, `Next Phases`, `Todo`, `下一步`, `Next` |
 | Paused tasks | `⏸️`, `Paused Tasks`, `暂停`, `Hold` |
-| Completed tasks | `✅`, `Completed`, `已完成`, `Recently Completed` |
-| Issues/Blockers | `🧱`, `Blockers`, `Issues`, `问题` |
+| Completed | `✅`, `Completed`, `已完成`, `Recently Completed` |
+| Blockers | `🧱`, `Blockers`, `Issues`, `问题` |
 | Notes | `🧠`, `Context Notes`, `Notes`, `备注`, `Context` |
 | Recovery | `⚡`, `Quick Recovery`, `恢复`, `Recovery` |
 | Archive Links | `🏛️`, `Archive Links`, `归档`, `Archive` |
@@ -111,7 +111,7 @@ Prompt user: "Task '[Task Name]' appears complete. Archive it with `/progress-ar
 - PROGRESS.md > 300 lines, OR Recently Completed > 5 items
 
 **If B detected:**
-Output (non-blocking): "PROGRESS.md 已有 N 行 / Recently Completed 有 N 条。Run `/progress-archive` (trim mode) to archive overflow completed items."
+Output (non-blocking): "PROGRESS.md 已有 N 行 / Recently Completed 有 N 条。Run `/progress-archive` and say '清理' or 'trim' to archive overflow completed items."
 
 **Example detection:**
 ```

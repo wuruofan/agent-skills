@@ -1,7 +1,7 @@
 ---
 name: progress-archive
 description: Use when a major task or all its phases are finished, when PROGRESS.md grows too long, when user asks to archive, clean up, trim, or move completed work to history (归档, 归档进度, 清理已完成, 任务完成, 进度太长, 收尾, 清理, 精简, trim, 太长了, 堆积)
-version: 1.9.0
+version: 1.9.1
 ---
 
 # Progress Archive
@@ -56,7 +56,7 @@ Lightweight cleanup: trim Recently Completed to recent 2-3 items, archive overfl
 ### Mode Selection
 
 Read user intent from message context:
-- Keywords like "清理", "精简", "trim", "太长", "堆积" → Mode B (Trim)
+- Keywords like "清理", "精简", "trim", "太长了", "堆积", "进度太长" → Mode B (Trim)
 - Keywords like "归档", "archive", "完成", "收尾" → Mode A (Major Task Archive)
 - Ambiguous → ask user which mode
 
@@ -166,7 +166,7 @@ Update `docs/progress/archive/README.md`:
 
 - Read full content
 - Count items in Recently Completed
-- (Next Phases / Blockers cleanup already done by /progress-save; skip here)
+- Note: Next Phases / Blockers cleanup is handled by /progress-save, not here
 
 #### Step 2: Identify Items to Trim
 

@@ -95,7 +95,7 @@ AI 执行 `git merge` / `git rebase` / `git cherry-pick` 出现冲突时：
 ### 用户说法触发（防御性补充）
 - 用户说"update/save/record PROGRESS.md"、"更新进度"、"保存进度"、"记录进度" → `/progress-save`
 - 用户说"restore/resume/load context"、"恢复进度"、"接着干"、"继续上次"、"之前干到哪了" → `/progress-restore`
-- 用户说"archive/clean up/trim"、"归档"、"任务完成"、"进度太长"、"清理"、"精简" → `/progress-archive`
+- 用户说"archive/clean up/trim/cleanup"、"归档"、"归档进度"、"任务完成"、"进度太长"、"清理"、"精简"、"太长了"、"堆积"、"收尾" → `/progress-archive`
 - 用户说"summarize/recap/handoff"、"总结一下"、"会话总结"、"交接"、"写个摘要" → `/progress-summary`
 - 用户说"merge progress"、"合并进度"、"PROGRESS 冲突"、"两个分支的 PROGRESS 怎么合" → `/progress-merge`
 ```

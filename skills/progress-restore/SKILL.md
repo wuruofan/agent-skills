@@ -1,7 +1,7 @@
 ---
 name: progress-restore
 description: Use when resuming work after a break, on a new device, in a new session, after switching branches, or when user asks to read, load, or restore context (恢复进度, 接着干, 继续上次, 加载进度, 读取进度, 之前干到哪了)
-version: 1.8.0
+version: 1.9.0
 ---
 
 # Progress Restore
@@ -30,11 +30,12 @@ Read the following sections (detect section names intelligently):
 
 1. **Current Focus**: What's being worked on now
 2. **Next Phases**: Planned next steps
-3. **Recently Completed**: Last completed phases
-4. **Blockers & Issues**: Any problems encountered
-5. **Context Notes**: Key decisions, design doc links
-6. **Quick Recovery**: Commands and key files to open
-7. **Archive Links**: Links to archived major tasks
+3. **Paused Tasks**: Mid-way tasks with blockers and entry points
+4. **Recently Completed**: Last completed phases
+5. **Blockers & Issues**: Any problems encountered
+6. **Context Notes**: Key decisions, design doc links
+7. **Quick Recovery**: Commands and key files to open
+8. **Archive Links**: Links to archived major tasks
 
 ### Step 3: Collect Additional Context
 
@@ -56,8 +57,14 @@ Read the following sections (detect section names intelligently):
 🎯 Current Focus
 - [Extracted from PROGRESS.md]
 
+⏸️ Paused Tasks
+- [Extracted from PROGRESS.md, if any]
+
 📥 Next Phases
 - [Extracted from PROGRESS.md]
+
+✅ Recently Completed
+- [Extracted from PROGRESS.md, if any]
 
 🧱 Blockers & Issues
 - [Extracted from PROGRESS.md, if any]
