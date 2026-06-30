@@ -77,27 +77,20 @@ Track project development progress, save and restore work sessions across device
 ```markdown
 ## Progress Tracking (Critical)
 
-### Situation-based triggers
-- Before commit/stash/PR: Call `/progress-save` to update PROGRESS.md
-- When resuming work after a break: Call `/progress-restore` to restore session context
-- When a major task or all its phases are finished: Call `/progress-archive` to archive history
-- When starting a new session to continue previous work: Call `/progress-summary` to get session context
-- Before `git merge` / `git rebase` / `git cherry-pick` involving PROGRESS.md (or detected PROGRESS.md conflict markers): Call `/progress-merge`
-- After resolving any git operation that left PROGRESS.md in conflict state: Call `/progress-merge` before continuing
+Triggers (call the matching skill):
+- Before commit/stash/PR/push → `/progress-save`
+- Resuming work, new device, branch switch → `/progress-restore`
+- Major task complete, PROGRESS.md too long → `/progress-archive`
+- New session continuing previous work → `/progress-summary`
+- `git merge` / `rebase` / `cherry-pick` touching PROGRESS.md (or conflict markers detected) → `/progress-merge`
+- After any git op that left PROGRESS.md in conflict state → `/progress-merge`
 
-### Sequencing during `git merge` operations
-When AI executes `git merge` / `git rebase` / `git cherry-pick` and conflicts arise:
-1. FIRST resolve non-PROGRESS.md conflicts in the working tree
-2. Verify tests pass or merge correctness is confirmed
-3. THEN call /progress-merge to handle PROGRESS.md conflict
-4. Finally `git add` + complete the merge
-
-### User-phrase triggers (defense-in-depth)
-- User says "update/save/record PROGRESS.md", "更新进度", "保存进度", "记录进度" → `/progress-save`
-- User says "restore/resume/load context", "恢复进度", "接着干", "继续上次", "之前干到哪了" → `/progress-restore`
-- User says "archive/clean up/trim/cleanup", "归档", "归档进度", "任务完成", "进度太长", "清理", "精简", "太长了", "堆积", "收尾" → `/progress-archive`
-- User says "summarize/recap/handoff", "总结一下", "会话总结", "交接", "写个摘要" → `/progress-summary`
-- User says "merge progress", "合并进度", "PROGRESS 冲突", "两个分支的 PROGRESS 怎么合" → `/progress-merge`
+### Git merge / rebase / cherry-pick sequencing
+When conflicts arise:
+1. Resolve non-PROGRESS.md conflicts first
+2. Verify (tests pass / merge correctness)
+3. Call `/progress-merge` for the PROGRESS.md conflict
+4. `git add` + complete the merge
 ```
 
 This lets LLM autonomously trigger skills at appropriate times.
