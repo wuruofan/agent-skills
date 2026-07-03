@@ -1,7 +1,7 @@
 ---
 name: progress-archive
 description: Use when a major task or all its phases are finished, when PROGRESS.md grows too long, when user asks to archive, clean up, trim, or move completed work to history (归档, 归档进度, 清理已完成, 任务完成, 进度太长, 收尾, 清理, 精简, trim, 太长了, 堆积)
-version: 1.9.1
+version: 1.9.2
 ---
 
 # Progress Archive
@@ -40,10 +40,9 @@ Lightweight cleanup: trim Recently Completed to recent 2-3 items, archive overfl
 
 **Archive content:**
 - Task name + completion date
-- All phases with their details
+- All phases (1 line per phase + link)
 - Design document links
-- Code statistics
-- Key decisions and context
+- Key decisions (1 line each)
 
 **Keep in PROGRESS.md:**
 - Current in-progress tasks
@@ -98,41 +97,26 @@ docs/progress/archive/
 > Completed: 2026-05-05
 
 ## Summary
-Major task: Rewrite Gateway + TUI runtime from Python to TypeScript
+Rewrite Gateway + TUI runtime from Python to TypeScript. 4 phases, 1025 tests pass.
 
 ## Phases
-### Phase 1: pi-agent-core Validation ✅
-- Verified Agent class instantiation
-- Tested event subscription
-- File: tui/test/pi-agent-core.test.ts
-
-### Phase 2: Tools Module ✅
-- 4 core tools: file_read, file_write, file_list, shell_execute
-- 25 tests passing
-- File: tui/src/tools/core.ts
-
-### Phase 4.1: Gateway TS ✅
-...
-
-### Phase 4.3: Harness Hooks ✅
-...
+- Phase 1: pi-agent-core Validation ✅ — Agent class + event subscription. [test](tui/test/pi-agent-core.test.ts)
+- Phase 2: Tools Module ✅ — 4 core tools, 25 tests. [code](tui/src/tools/core.ts)
+- Phase 4.1: Gateway TS ✅
+- Phase 4.3: Harness Hooks ✅
 
 ## Design Documents
-- docs/design/2026-05-03-gateway-ts-rewrite-plan.md
-- docs/design/2026-05-04-phase-4-2-captain-crew-starlight-design.md
-- docs/design/harness/2026-05-05-harness-design.md
-
-## Code Statistics
-- Gateway: 600 lines
-- Session: 420 lines
-- Tools: 260 lines
-- Tests: ~1400 lines
+- [Gateway TS rewrite plan](docs/design/2026-05-03-gateway-ts-rewrite-plan.md)
+- [Captain-Crew design](docs/design/2026-05-04-phase-4-2-captain-crew-starlight-design.md)
+- [Harness design](docs/design/harness/2026-05-05-harness-design.md)
 
 ## Key Decisions
 - Terminal → Session 1:1 mapping
 - Multi SessionManager parallel execution
 - Batch execution mode for Crew
 ```
+
+> **Note:** Archive files are L2 (Reference) in the Progressive Disclosure model. They should be concise — each phase 1 line + link, not full implementation notes. Design details belong in the spec/plan docs they link to.
 
 ### Step 4: Update PROGRESS.md
 
