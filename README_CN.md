@@ -81,6 +81,7 @@ npx skills add wuruofan/agent-skills --skill progress-save --skill progress-rest
 - 提交/stash/PR/push 前 → `/progress-save`
 - 恢复工作、新设备、切换分支 → `/progress-restore`
 - 大任务完成、PROGRESS.md 过长 → `/progress-archive`
+- Unverified/待手测 表膨胀（✅ 项 >3 或总项 >10）→ `/progress-archive`（Mode C verify-cleanup）
 - 新会话继续之前工作 → `/progress-summary`
 - `git merge` / `rebase` / `cherry-pick` 涉及 PROGRESS.md（或检测到冲突标记）→ `/progress-merge`
 - 任何 git 操作导致 PROGRESS.md 处于冲突状态后 → `/progress-merge`
@@ -91,11 +92,17 @@ npx skills add wuruofan/agent-skills --skill progress-save --skill progress-rest
 2. 验证（测试通过 / 合并正确）
 3. 调用 `/progress-merge` 处理 PROGRESS.md 冲突
 4. `git add` + 完成合并
+
+### 读取项目状态文件（防 thrashing）
+读取 PROGRESS.md、CLAUDE.md、AGENTS.md 或任何 >300 行的项目文档时：
+- 先只读前 50 行（frontmatter + section 标题），使用 Read 的 `offset`/`limit` 参数
+- 然后按行段定向读取需要的具体 section
+- 禁止对 >300 行的文件无 `offset`/`limit` 调用 Read —— 这是 autocompact thrashing 的头号诱因
 ```
 
 让 LLM 在合适时机自主触发技能。
 
-**说明：** `/progress-save` 会自动检测已完成的大任务并提示归档建议，也会检测 PROGRESS.md 合并冲突并跳转到 `/progress-merge`。
+**说明：** `/progress-save` 会自动检测已完成的大任务并提示归档建议，也会检测 PROGRESS.md 合并冲突并跳转到 `/progress-merge`，并检测 Unverified 表膨胀以建议 `/progress-archive` Mode C。
 
 ---
 

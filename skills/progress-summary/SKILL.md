@@ -1,7 +1,7 @@
 ---
 name: progress-summary
 description: Use when starting a new session, handing off to another session, or when context is getting long and user asks for a summary, recap, or handoff (生成总结, 会话总结, 总结一下, 上下文回顾, 接着上次干, 交接, 写个摘要)
-version: 1.8.0
+version: 1.8.1
 ---
 
 # Progress Summary
@@ -73,6 +73,18 @@ Detect sections by common patterns:
 ```
 
 Format output for easy copy-paste into new sessions.
+
+## Large File Reading (Anti-Thrashing Policy)
+
+**Problem**: Reading a long PROGRESS.md in a single Read call fills the context window and triggers autocompact thrashing ("Autocompact is thrashing: context refilled to limit within 3 turns").
+
+**Trigger**: PROGRESS.md > 300 lines.
+
+**Policy — read in segments, not whole-file**:
+1. **First pass**: `Read(offset: 1, limit: 50)` — get frontmatter + section headings.
+2. **Second pass**: For sections needed in the summary (Current Focus / Next Phases / Recently Completed / Blockers), `Read(offset: <section_start>, limit: <section_length>)` — only those lines.
+3. **Skip secondary sections**: Archive Links and Quick Recovery can be skipped or read with a small limit — they rarely affect summary quality.
+4. **Hard rule**: Never call `Read` on a > 300-line PROGRESS.md without `offset`/`limit`.
 
 ## Examples
 

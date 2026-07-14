@@ -1,7 +1,7 @@
 ---
 name: progress-restore
 description: Use when resuming work after a break, on a new device, in a new session, after switching branches, or when user asks to read, load, or restore context (恢复进度, 接着干, 继续上次, 加载进度, 读取进度, 之前干到哪了)
-version: 1.9.0
+version: 1.9.1
 ---
 
 # Progress Restore
@@ -101,3 +101,15 @@ When reading PROGRESS.md, detect sections by common patterns:
 | Archive Links | `🏛️`, `Archive Links`, `归档`, `Archive` |
 
 Projects may use any naming convention - adapt extraction logic to match existing sections.
+
+## Large File Reading (Anti-Thrashing Policy)
+
+**Problem**: Reading a long PROGRESS.md in a single Read call fills the context window and triggers autocompact thrashing ("Autocompact is thrashing: context refilled to limit within 3 turns").
+
+**Trigger**: PROGRESS.md > 300 lines.
+
+**Policy — read in segments, not whole-file**:
+1. **First pass**: `Read(offset: 1, limit: 50)` — get frontmatter + section headings.
+2. **Second pass**: For each section listed in Step 2, `Read(offset: <section_start>, limit: <section_length>)` — only the lines you need to extract.
+3. **Skip irrelevant sections**: If user only asks "what was I working on?", read only Current Focus + Context Notes + Quick Recovery — skip Archive Links, Recently Completed, etc.
+4. **Hard rule**: Never call `Read` on a > 300-line PROGRESS.md without `offset`/`limit`. Use the structural read to plan targeted reads.

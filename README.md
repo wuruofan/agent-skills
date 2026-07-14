@@ -81,6 +81,7 @@ Triggers (call the matching skill):
 - Before commit/stash/PR/push → `/progress-save`
 - Resuming work, new device, branch switch → `/progress-restore`
 - Major task complete, PROGRESS.md too long → `/progress-archive`
+- Unverified/待手测 table bloat (✅ items >3 or total >10) → `/progress-archive` (Mode C verify-cleanup)
 - New session continuing previous work → `/progress-summary`
 - `git merge` / `rebase` / `cherry-pick` touching PROGRESS.md (or conflict markers detected) → `/progress-merge`
 - After any git op that left PROGRESS.md in conflict state → `/progress-merge`
@@ -91,11 +92,17 @@ When conflicts arise:
 2. Verify (tests pass / merge correctness)
 3. Call `/progress-merge` for the PROGRESS.md conflict
 4. `git add` + complete the merge
+
+### Reading project state files (anti-thrashing)
+When reading PROGRESS.md, CLAUDE.md, AGENTS.md, or any project doc > 300 lines:
+- First read only the first 50 lines (frontmatter + section headings) using Read with `offset`/`limit`
+- Then read only the specific sections you need by line range
+- Never call Read on a > 300-line file without `offset`/`limit` — this is the #1 cause of autocompact thrashing
 ```
 
 This lets LLM autonomously trigger skills at appropriate times.
 
-**Note:** `/progress-save` will automatically detect completed major tasks and prompt archive suggestion when appropriate. It will also detect PROGRESS.md merge conflicts and redirect to `/progress-merge`.
+**Note:** `/progress-save` will automatically detect completed major tasks and prompt archive suggestion when appropriate. It will also detect PROGRESS.md merge conflicts and redirect to `/progress-merge`, and detect Unverified-table bloat to suggest `/progress-archive` Mode C.
 
 ---
 

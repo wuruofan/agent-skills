@@ -1,7 +1,7 @@
 ---
 name: progress-save
 description: Use when user asks to update, save, record, or write to PROGRESS.md (更新进度, 保存进度, 记录进度, 更新 PROGRESS.md), or before git commit/stash/checkout/PR/push, or at end of work session
-version: 1.4.0
+version: 1.5.0
 ---
 
 # Progress Save
@@ -229,7 +229,7 @@ Every item is a hard trigger, not "compress if it has grown beyond…". Hit = ch
 
 ### Step 4: Detect Archive Needs
 
-After updating content, check two conditions (in priority order):
+After updating content, check three conditions (in priority order):
 
 **Condition A — Major task completion (higher priority):**
 - Major task section header contains ✅ or "已完成" marker
@@ -247,6 +247,14 @@ Prompt user: "Task '[Task Name]' appears complete. Archive it with `/progress-ar
 **If B detected:**
 Output (non-blocking): "PROGRESS.md 已有 N 行 / Recently Completed 有 N 条。Run `/progress-archive` and say '清理' or 'trim' to archive overflow completed items."
 
+**Condition C — Unverified / 待手测 table bloat:**
+- Detect Unverified / 待手测 table in PROGRESS.md (section names: "Unverified", "待手测", "TTY 待手测", "Manual Test Pending", etc.)
+- Count ✅ verified items in Unverified → if > 3: trigger
+- Count total Unverified items → if > 10: trigger
+
+**If C detected:**
+Output (non-blocking): "Unverified table has N items (M already ✅ verified). Run `/progress-archive` with 'verify-cleanup' or '待手测清理' to triage — verified items don't belong in Unverified anymore."
+
 **Example detection:**
 ```
 ## ✅ TS Runtime Rewrite Phase 1-4
@@ -255,11 +263,31 @@ Output (non-blocking): "PROGRESS.md 已有 N 行 / Recently Completed 有 N 条�
 ### Phase 4.1: ✅
 ...
 → All phases complete → Prompt archive suggestion (Condition A)
+
+## Unverified / 待手测
+| # | Item | Status |
+| 2 | chat.send timeout | ✅ verified |
+| 3 | streaming output | ✅ verified |
+| ... (12 more, 9 are ✅) |
+→ 9 ✅ items in Unverified (>3) AND 15 total (>10) → Prompt verify-cleanup suggestion (Condition C)
 ```
 
 ### Step 5: Write to Disk
 
 Write updated content preserving exact structure and formatting style.
+
+## Large File Reading (Anti-Thrashing Policy)
+
+**Problem**: Reading a long PROGRESS.md in a single Read call fills the context window and triggers autocompact thrashing ("Autocompact is thrashing: context refilled to limit within 3 turns").
+
+**Trigger**: PROGRESS.md > 300 lines.
+
+**Policy — read in segments, not whole-file**:
+1. **First pass**: `Read(offset: 1, limit: 50)` — get frontmatter + section headings to understand layout.
+2. **Second pass**: For each section that needs updating, `Read(offset: <section_start>, limit: <section_length>)` — only the relevant lines.
+3. **Skip unchanged sections**: Sections not touched by this save don't need to be read at all.
+4. **Prefer Edit over Write for large files**: After reading the sections you need, use `Edit` tool for targeted changes. Only use `Write` (full file rewrite) when changes span most of the file.
+5. **Hard rule**: Never call `Read` on a > 300-line PROGRESS.md without `offset`/`limit`. A single full-file Read is the most common cause of autocompact thrashing.
 
 ## Reference Standard Format (Optional)
 
@@ -318,7 +346,7 @@ This standard format is provided as **reference only**. Projects can adopt it if
 | Create archive files | ✗ | ✓ | ✗ | ✗ |
 | Git operations | ✗ | Optional commit | ✗ | Optional `git add` |
 | Generate summary | ✗ | ✗ | ✓ | ✗ |
-| Trigger detection | Archive suggestion, **Merge redirect** | N/A | N/A | N/A |
+| Trigger detection | Archive suggestion (Mode A/B/**C**), **Merge redirect** | N/A | N/A | N/A |
 | Resolves PROGRESS.md conflicts | ✗ | ✗ | ✗ | ✓ |
 
 **Trigger timing:**

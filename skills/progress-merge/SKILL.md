@@ -1,7 +1,7 @@
 ---
 name: progress-merge
 description: Use when PROGRESS.md has merge conflicts (after `git merge` / `git rebase` / `git cherry-pick` involving PROGRESS.md), or when user wants to compare/merge progress state between two branches (合并 PROGRESS 冲突, merge progress across branches, 两个分支的 PROGRESS 怎么合, PROGRESS conflict 怎么解决, 解决 progress 冲突, dry-run compare branches)
-version: 1.0.0
+version: 1.1.0
 ---
 
 # Progress Merge
@@ -122,6 +122,7 @@ Before writing, re-read working tree PROGRESS.md and compare hash with Step 1. I
 | `🧠 Context Notes` | **union (append)** | Notes: more is better |
 | `⚡ Quick Recovery` | **union + annotate source** | Theirs items marked `[from <branch>]` |
 | `🏛️ Archive Links` | **union** | Pure links, safest |
+| `🔍 Unverified / 待手测` | **union + status-priority dedup** | Gray-zone section (code shipped + tests pass + manual test pending). Same-task items: take higher verify-state (✅ verified > shipped-won't-verify > ⏳ pending). Never downgrade a verified item. If union produces > 10 items or > 3 ✅ items → suggest `/progress-archive` Mode C (verify-cleanup) after merge completes. |
 
 ## Section Detection Table
 
@@ -136,6 +137,7 @@ Before writing, re-read working tree PROGRESS.md and compare hash with Step 1. I
 | Notes | `🧠`, `Context Notes`, `Notes`, `备注`, `Context` |
 | Recovery | `⚡`, `Quick Recovery`, `恢复`, `Recovery` |
 | Archive Links | `🏛️`, `Archive Links`, `归档`, `Archive` |
+| Unverified / 待手测 | `🔍`, `Unverified`, `待手测`, `TTY 待手测`, `Manual Test Pending`, `待验证` |
 
 If both sides use different section naming styles → add to "must-ask" queue.
 
@@ -152,7 +154,7 @@ If both sides use different section naming styles → add to "must-ask" queue.
 
 **Sub-heading body** = heading line → next same-level heading / higher-level heading / `---` / EOF. Entire body merges as one unit (no nested decomposition).
 
-**Task attributes**: Title (strip markers/checkboxes/emojis) · Status (`[x]`/`✅`=done, `[ ]`=pending, `⏸️`=paused, `(WIP)`=in_progress) · Sub-items (indented bullets) · Description (non-structural text after title)
+**Task attributes**: Title (strip markers/checkboxes/emojis) · Status (`[x]`/`✅`=done, `[ ]`=pending, `⏸️`=paused, `(WIP)`=in_progress, `📦`=shipped-待验证) · Sub-items (indented bullets) · Description (non-structural text after title)
 
 ### "Same task?" Judgment (3 tiers)
 
@@ -168,7 +170,7 @@ If both sides use different section naming styles → add to "must-ask" queue.
 
 | Field | Rule |
 |---|---|
-| Status | Take higher completion (done > in_progress > pending) |
+| Status | Take higher completion; see Status Completion Order below for gray zones (done > shipped-待验证 > in_progress > pending; paused is gray) |
 | Description | If semantically different → must-ask queue; if highly similar → take longer |
 | Sub-items | union + dedup |
 | Timestamp | max |
@@ -177,10 +179,18 @@ If both sides use different section naming styles → add to "must-ask" queue.
 
 **Clear**: `pending < in_progress < ✅ done`
 
-**Gray zone**: `⏸️ paused` vs `in_progress`/`pending` — paused may mean "80% done then paused" or "barely started then paused":
+**Gray zone 1 — `⏸️ paused` vs `in_progress`/`pending`**: paused may mean "80% done then paused" or "barely started then paused":
 - If paused item has progress description → LLM judges from description
 - If cannot judge from description → must-ask queue
 - `✅ done` always wins over paused
+
+**Gray zone 2 — `📦 shipped-待验证` vs `✅ done` / `in_progress`** (motelet scenario: code shipped + tests pass + manual/TTY test pending):
+- `📦 shipped-待验证` sits between `in_progress` and `✅ done` — code is merged/shipped but verification not complete
+- `✅ done` (fully verified) always wins over `📦 shipped-待验证` — never downgrade a verified item
+- `📦 shipped-待验证` wins over `in_progress` — shipped is closer to done
+- Both sides `📦 shipped-待验证` → keep as `📦 shipped-待验证` (do NOT auto-promote to ✅; verification status must be preserved for tracking)
+- One side `📦 shipped-待验证`, other side `⏸️ paused` → must-ask queue (shipped vs paused is genuinely ambiguous: shipped may be "shipped then deprioritized for verification" while paused may be "paused before shipping")
+- Detection markers for `📦 shipped-待验证`: "代码已 ship", "shipped", "tests pass", "测试通过", "TTY 待手测", "manual test pending", "待手测", "待验证", absence of ✅ on a shipped item
 
 ## Heuristic Arbitration & Recommendation
 
@@ -217,9 +227,28 @@ If both sides use different section naming styles → add to "must-ask" queue.
 ## Large File Budget
 
 If either side > 500 lines:
-- **Core sections** (Current Focus / Next Phases / Paused Tasks / Recently Completed / **Blockers**) → full task-level parsing
+- **Core sections** (Current Focus / Next Phases / Paused Tasks / Recently Completed / **Blockers** / **Unverified**) → full task-level parsing
 - **Secondary sections** (Context Notes / Quick Recovery / Archive Links) → section-level union only
 - If > 1000 lines → suggest `/progress-archive` first (non-blocking)
+
+## Large File Reading (Anti-Thrashing Policy)
+
+**Problem**: Reading a long PROGRESS.md (or both sides of a merge) in a single Read call fills the context window. After a few tool calls, the session hits autocompact, which thrashes — the context refills to the limit within 2-3 turns, repeatedly. This is the "Autocompact is thrashing" warning.
+
+**Trigger**: Any side > 300 lines (the same threshold used for preview truncation). At 300 lines × ~10 tokens/line ≈ 3K tokens per side, reading both sides + git context + arbitration quickly approaches context limits.
+
+**Policy — read in segments, not whole-file**:
+
+1. **First pass — structural read**: Read only the first 50 lines (frontmatter + section headings) of each side using `Read` with `offset: 1, limit: 50`. This identifies section layout without loading full content.
+2. **Second pass — targeted section reads**: For each section you need to parse (per Merge Strategy Table), read just that section's line range. Use the section heading line numbers from pass 1 to compute offset/limit.
+   - Example: if `✅ Recently Completed` starts at line 120 and `🧱 Blockers` starts at line 180 → `Read(offset: 120, limit: 60)` to get just the Completed section.
+3. **Skip sections that don't need task-level parsing**: For secondary sections under Large File Budget (Context Notes / Quick Recovery / Archive Links), do NOT read them segment-by-segment — they'll be section-level union'd from the structural read + a single bounded read if needed.
+4. **Never read both sides simultaneously in full**: alternate — parse ours fully (in segments), then parse theirs (in segments). This halves the peak context usage.
+5. **If context is already near limit** (e.g. resuming from a prior compact): skip pass 1, jump straight to reading only the sections mentioned in user's intent (e.g. if user said "merge the Unverified table", read only that section from both sides).
+
+**Hard rule**: If you catch yourself about to call `Read` on a file > 300 lines WITHOUT offset/limit, stop. Use the segmented approach above. A single full-file Read of a 500+ line PROGRESS.md is the most common cause of autocompact thrashing in this skill.
+
+**Applies to both Mode A and Mode C**: In Mode A, both `:2:` and `:3:` versions are subject to this policy. In Mode C, both ref/path inputs are subject to it. For Mode A, you can use `git show :2:PROGRESS.md | head -50` via RunCommand as the structural read (avoids Read tool on a git-index blob that isn't a real file path).
 
 ## Sequencing Awareness
 
