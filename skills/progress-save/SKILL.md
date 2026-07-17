@@ -1,7 +1,7 @@
 ---
 name: progress-save
 description: Use when user asks to update, save, record, or write to PROGRESS.md (更新进度, 保存进度, 记录进度, 更新 PROGRESS.md), or before git commit/stash/checkout/PR/push, or at end of work session
-version: 1.6.0
+version: 1.7.0
 ---
 
 # Progress Save
@@ -58,20 +58,6 @@ Principles are the primary guide; Size Budget is the objective backstop. Use pri
 | 🧱 Blockers | Each item: problem + status, 1-2 lines | `Per-call timeout — refactor shipped, long-task manual test pending` |
 | 🧠 Context Notes | Key info for restoring context: rationale, dev findings, experiment records, key decisions. Each item 1-3 sentences. Large architecture diagrams / full code flows → link to doc | `Captain-Crew orchestration: only one Captain turn per session, enforced by turnGuard state machine. See [architecture.md]` |
 | ⚡ Quick Recovery | Commands first; add ≤1 line comment if needed | `bun run test:gateway  # gateway only, ~12s` |
-
-### Section Contract
-
-Each section defines both what belongs in it and what doesn't. The core L0 constraint — when a section's name doesn't match its actual function, signals get polluted immediately.
-
-| Section | Belongs | Does NOT belong |
-|---------|---------|-----------------|
-| 🎯 Current Focus | In-progress tasks + 1-2 sentence status; link spec/plan if available | Shipped retrospectives, archive links (→ Archive Links), multi-paragraph historical changes |
-| 📥 Next Phases | Truly pending phases/tasks with spec/plan links | Status = ✅ / 📦 / archived / shipped (→ delete); ad-hoc TODOs like "I'll do X later" (should go in spec first) |
-| ⏸️ Paused Tasks | Task name + 1-sentence pause reason + entry point + design link | Full design sketches, multi-paragraph "restart prerequisites", alternative comparisons |
-| ✅ Recently Completed | Task name + date + 1 sentence + archive link | Multiple releases merged into one line; >3 items (→ triggers archive) |
-| 🧱 Blockers & Issues | Active blockers + status | Resolved (strikethrough / ✅, → delete; git log has record) |
-| 🧠 Context Notes | 1-3 sentence key findings/decisions/rationale, large content linked out | ASCII architecture diagrams (→ ARCHITECTURE.md), full test statistics (→ CI dashboard), reference project lists (→ README) |
-| ⚡ Quick Recovery | ≤5 core commands with necessary comments | >5 line bash blocks (→ README/CLAUDE.md); file `open:` lists (→ IDE recents) |
 
 ### Size Budget
 
@@ -181,17 +167,36 @@ Before writing or updating any entry, run through this checklist. If any item hi
 
 ### Step 2: Intelligent Section Detection
 
-Match content to existing sections by patterns:
+Match content to existing sections. **Three-layer identification (fallback in order):**
 
-Sections: `> Last updated`/`> 最后更新` | 🎯/Current/当前 | 📥/Next Phases/Todo/下一步 | ⏸️/Paused/暂停 | ✅/Completed/已完成/Recently Completed | 🧱/Blockers/问题 | 🧠/Notes/备注 | ⚡/Recovery/恢复 | 🏛️/Archive/归档 | 🔍/Unverified/待手测/待验证/Manual Test Pending
+1. **Layer 1 — emoji / exact alias match**: section heading contains the emoji or alias listed in the table below. Covers standard cases (~90%).
+2. **Layer 2 — content semantic match**: if no name match, judge by the section's content contract (the "Belongs" column). If a heading's actual content matches a section's contract, treat it as that section — even if the heading name is non-standard (e.g. `## 🧪 手测清单` matches Unverified's contract).
+3. **Layer 3 — unresolvable**: if Layers 1-2 can't uniquely identify (e.g. ambiguous between Paused and Unverified), ask user; do not guess.
 
-- Search for section names matching patterns above
-- If found: update within that section
-- If not found: append to most relevant section or ask user
+**Hard rule**: semantic identification is for content processing only — **never rename an existing section**. Format Preservation Policy still applies. A `## 🧪 手测清单` section is processed as Unverified but keeps its original name.
+
+### Section Detection & Contract Table
+
+Unified identification + content rules. Each section's "Belongs" doubles as the Layer 2 semantic predicate.
+
+| Section | Emoji / aliases | Belongs (Layer 2 semantic contract) | Does NOT belong |
+|---------|-----------------|--------------------------------------|-----------------|
+| `> Last updated` | `> Last updated` / `> 最后更新` | Timestamp header | — |
+| 🎯 Current Focus | 🎯 / Current / 当前 | In-progress tasks + 1-2 sentence status; link spec/plan if available | Shipped retrospectives, archive links, multi-paragraph history |
+| 📥 Next Phases | 📥 / Next Phases / Todo / 下一步 | Truly pending phases/tasks with spec/plan links | Status = ✅ / 📦 / archived / shipped (→ delete); ad-hoc TODOs |
+| ⏸️ Paused Tasks | ⏸️ / Paused / 暂停 | Task name + 1-sentence pause reason + entry point + design link | Full design sketches, multi-paragraph "restart prerequisites" |
+| ✅ Recently Completed | ✅ / Completed / 已完成 / Recently Completed | Task name + date + 1 sentence + archive link | Multiple releases merged into 1 line; >3 items (→ triggers archive) |
+| 🧱 Blockers & Issues | 🧱 / Blockers / 问题 | Active blockers + status | Resolved (strikethrough / ✅, → delete; git log has record) |
+| 🧠 Context Notes | 🧠 / Notes / 备注 | 1-3 sentence key findings/decisions/rationale, large content linked out | ASCII diagrams (→ ARCHITECTURE.md), full test stats, reference lists |
+| ⚡ Quick Recovery | ⚡ / Recovery / 恢复 | ≤5 core commands with necessary comments | >5 line bash blocks; file `open:` lists |
+| 🏛️ Archive Links | 🏛️ / Archive / 归档 | Links to archived task files | Archive content itself (lives in archive files) |
+| 🔍 Unverified | 🔍 / Unverified / 待手测 / 待验证 / Manual Test Pending | Items in code-shipped + tests-pass + manual-test-pending gray zone | Already-✅ verified items; pure TODOs without shipped code |
+
+If no section matches after Layer 2: append to most relevant section or ask user.
 
 ### Step 3: Update Content (Preserve Structure, Apply All Rules)
 
-Update content while preserving the exact structure. **Every item must pass Pre-Write Self-Check + Section Contract + Size Budget + Brevity Guidelines.** Default to compression over completeness — details belong in L1/L2.
+Update content while preserving the exact structure. **Every item must pass Pre-Write Self-Check + Section Detection & Contract Table + Size Budget + Brevity Guidelines.** Default to compression over completeness — details belong in L1/L2.
 
 1. **Last updated time**: Update header timestamp if exists
 2. **Completed tasks**: Add to appropriate completed section — concise per Brevity Guidelines

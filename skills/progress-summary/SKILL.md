@@ -1,7 +1,7 @@
 ---
 name: progress-summary
 description: Use when starting a new session, handing off to another session, or when context is getting long and user asks for a summary, recap, or handoff (生成总结, 会话总结, 总结一下, 上下文回顾, 接着上次干, 交接, 写个摘要)
-version: 1.8.2
+version: 1.9.0
 ---
 
 # Progress Summary
@@ -31,9 +31,22 @@ Find project root (upward to `.git`/`PROGRESS.md`); target `PROGRESS.md` in root
 
 ### Step 2: Intelligent Section Detection
 
-Match sections by patterns:
+Match sections using the unified Section Detection table below. **Three-layer identification:** (1) emoji/alias match, (2) content semantic match — if no name match, judge by the "Belongs" contract column, (3) unresolvable → skip or ask user. Never rename existing sections during extraction.
 
-Sections: `> Last updated`/`> 最后更新` | 🎯/Current/当前 | 📥/Next Phases/Todo/下一步 | ⏸️/Paused/暂停 | ✅/Completed/已完成/Recently Completed | 🧱/Blockers/问题 | 🧠/Notes/备注 | ⚡/Recovery/恢复 | 🏛️/Archive/归档 | 🔍/Unverified/待手测/待验证/Manual Test Pending
+### Section Detection & Contract Table
+
+| Section | Emoji / aliases | Belongs (Layer 2 semantic contract) |
+|---------|-----------------|--------------------------------------|
+| `> Last updated` | `> Last updated` / `> 最后更新` | Timestamp header |
+| 🎯 Current Focus | 🎯 / Current / 当前 | In-progress tasks + 1-2 sentence status |
+| 📥 Next Phases | 📥 / Next Phases / Todo / 下一步 | Truly pending phases/tasks with spec/plan links |
+| ⏸️ Paused Tasks | ⏸️ / Paused / 暂停 | Task name + 1-sentence pause reason + entry point |
+| ✅ Recently Completed | ✅ / Completed / 已完成 / Recently Completed | Task name + date + 1 sentence + archive link |
+| 🧱 Blockers & Issues | 🧱 / Blockers / 问题 | Active blockers + status |
+| 🧠 Context Notes | 🧠 / Notes / 备注 | 1-3 sentence key findings/decisions/rationale |
+| ⚡ Quick Recovery | ⚡ / Recovery / 恢复 | ≤5 core commands with necessary comments |
+| 🏛️ Archive Links | 🏛️ / Archive / 归档 | Links to archived task files |
+| 🔍 Unverified | 🔍 / Unverified / 待手测 / 待验证 / Manual Test Pending | Items in code-shipped + tests-pass + manual-test-pending gray zone |
 
 ### Step 3: Generate Summary
 

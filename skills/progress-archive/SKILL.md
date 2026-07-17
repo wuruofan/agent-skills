@@ -1,7 +1,7 @@
 ---
 name: progress-archive
 description: Use when a major task or all its phases are finished, when PROGRESS.md grows too long, when user asks to archive, clean up, trim, or move completed work to history, when an Unverified/待手测 table needs verify-cleanup (归档, 归档进度, 清理已完成, 任务完成, 进度太长, 收尾, 清理, 精简, trim, 太长了, 堆积, verify-cleanup, 验证清理, 待手测清理, unverified 表清理)
-version: 2.0.1
+version: 2.1.0
 ---
 
 # Progress Archive
@@ -195,7 +195,7 @@ Same as Mode A Step 6.
 #### Step 1: Read PROGRESS.md + Detect Unverified Section
 
 - Read full content
-- Locate the Unverified / 待手测 table (section names vary: "Unverified", "待手测", "TTY 待手测", "Manual Test Pending", etc. — use the same intelligent section detection as save/merge)
+- Locate the Unverified table via three-layer identification (same as save/merge): (1) emoji/alias match — "Unverified", "待手测", "TTY 待手测", "Manual Test Pending", etc., (2) content semantic match — a section whose items are in code-shipped + tests-pass + manual-test-pending state, even if the heading name is non-standard (e.g. `## 🧪 手测清单`), (3) unresolvable → exit. Never rename the section.
 - If no Unverified section found → exit: "No Unverified/待手测 table detected. Mode C has nothing to do."
 - Count total items and tally by status: ✅ verified / ⏳ pending / shipped-won't-verify / other
 

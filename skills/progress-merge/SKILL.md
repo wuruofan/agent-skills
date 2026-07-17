@@ -1,7 +1,7 @@
 ---
 name: progress-merge
 description: Use when PROGRESS.md has merge conflicts (after `git merge` / `git rebase` / `git cherry-pick` involving PROGRESS.md), or when user wants to compare/merge progress state between two branches (合并 PROGRESS 冲突, merge progress across branches, 两个分支的 PROGRESS 怎么合, PROGRESS conflict 怎么解决, 解决 progress 冲突, dry-run compare branches)
-version: 1.1.1
+version: 1.2.0
 ---
 
 # Progress Merge
@@ -117,7 +117,20 @@ Before writing, re-read working tree PROGRESS.md and compare hash with Step 1. I
 
 ## Section Detection Table
 
-Sections: `> Last updated`/`> 最后更新` | 🎯/Current/当前 | 📥/Next Phases/Todo/下一步 | ⏸️/Paused/暂停 | ✅/Completed/已完成/Recently Completed | 🧱/Blockers/问题 | 🧠/Notes/备注 | ⚡/Recovery/恢复 | 🏛️/Archive/归档 | 🔍/Unverified/待手测/待验证/Manual Test Pending
+Unified identification + content rules. **Three-layer identification:** (1) emoji/alias match, (2) content semantic match — if no name match, judge by the "Belongs" contract column, (3) unresolvable → treat as custom section, ask user during arbitration. Never rename existing sections on either side.
+
+| Section | Emoji / aliases | Belongs (Layer 2 semantic contract) |
+|---------|-----------------|--------------------------------------|
+| `> Last updated` | `> Last updated` / `> 最后更新` | Timestamp header |
+| 🎯 Current Focus | 🎯 / Current / 当前 | In-progress tasks + 1-2 sentence status |
+| 📥 Next Phases | 📥 / Next Phases / Todo / 下一步 | Truly pending phases/tasks with spec/plan links |
+| ⏸️ Paused Tasks | ⏸️ / Paused / 暂停 | Task name + 1-sentence pause reason + entry point |
+| ✅ Recently Completed | ✅ / Completed / 已完成 / Recently Completed | Task name + date + 1 sentence + archive link |
+| 🧱 Blockers & Issues | 🧱 / Blockers / 问题 | Active blockers + status |
+| 🧠 Context Notes | 🧠 / Notes / 备注 | 1-3 sentence key findings/decisions/rationale |
+| ⚡ Quick Recovery | ⚡ / Recovery / 恢复 | ≤5 core commands with necessary comments |
+| 🏛️ Archive Links | 🏛️ / Archive / 归档 | Links to archived task files |
+| 🔍 Unverified | 🔍 / Unverified / 待手测 / 待验证 / Manual Test Pending | Items in code-shipped + tests-pass + manual-test-pending gray zone |
 
 If both sides use different section naming styles → add to "must-ask" queue.
 
