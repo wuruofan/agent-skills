@@ -1,7 +1,7 @@
 ---
 name: progress-archive
 description: Use when a major task or all its phases are finished, when PROGRESS.md grows too long, when user asks to archive, clean up, trim, or move completed work to history, when an Unverified/待手测 table needs verify-cleanup (归档, 归档进度, 清理已完成, 任务完成, 进度太长, 收尾, 清理, 精简, trim, 太长了, 堆积, verify-cleanup, 验证清理, 待手测清理, unverified 表清理)
-version: 2.0.0
+version: 2.0.1
 ---
 
 # Progress Archive
@@ -12,64 +12,36 @@ Archive completed major tasks from PROGRESS.md. Keeps PROGRESS.md concise while 
 
 LLM auto-selects mode based on user intent — no CLI flags needed.
 
-### Mode A: Major Task Archive (default)
-
-Triggered by: "归档", "archive", "任务完成", "收尾", or when save detects a fully-completed major task.
-
-Archive an entire completed major task (all phases ✅) to a standalone file.
-
-### Mode B: Trim
-
-Triggered by: "清理", "精简", "trim", "太长了", "堆积", "进度太长", or when save bloat detection triggers.
-
-Lightweight cleanup: trim Recently Completed to recent 2-3 items, archive overflow to a monthly trim file. Does NOT require a major task to be fully complete. Next Phases / Blockers cleanup is handled automatically by /progress-save. Also covers Unverified-table overflow (see Mode B Step 2 rules).
-
-### Mode C: Verify-cleanup
-
-Triggered by: "verify", "verify-cleanup", "待手测", "unverified", "验证清理", "待手测清理", "unverified 表清理", or when save detects an Unverified/待手测 table with bloat (✅ items > 3 or total items > 10).
-
-Clean up the "Unverified / 待手测" table — items in code-shipped + tests-pass + manual-test-pending state. This gray zone is neither Mode A (not a completed major task) nor Mode B (not Recently Completed overflow). Mode C triages items into three buckets:
-- Already ✅ verified items → move to corresponding archive file (verified long ago, no reason to stay in Unverified)
-- Items explicitly marked "code shipped" / "won't verify" (e.g. shipped to production, no longer testable) → close directly (remove from Unverified, optionally note in Recently Completed)
-- Long-pending ⏳ items impossible or no longer worth verifying → move to Paused Tasks or archive
+- **Mode A: Major Task Archive** — triggered by "归档", "archive", "任务完成", "收尾", or when save detects a fully-completed major task. Archive an entire completed major task (all phases ✅) to a standalone file.
+- **Mode B: Trim** — triggered by "清理", "精简", "trim", "太长了", "堆积", "进度太长", or when save bloat detection triggers. Lightweight cleanup of Recently Completed to recent 2-3 items; archive overflow to a monthly trim file. Does NOT require a major task to be fully complete. Next Phases / Blockers cleanup is handled automatically by /progress-save. Also covers Unverified-table overflow (see Mode B Step 2 rules).
+- **Mode C: Verify-cleanup** — triggered by "verify", "verify-cleanup", "待手测", "unverified", "验证清理", "待手测清理", "unverified 表清理", or when save detects an Unverified/待手测 table with bloat (✅ items > 3 or total items > 10). Clean up the "Unverified / 待手测" table — items in code-shipped + tests-pass + manual-test-pending state. This gray zone is neither Mode A (not a completed major task) nor Mode B (not Recently Completed overflow). Mode C triages items into buckets:
+  - Already ✅ verified items → move to corresponding archive file (verified long ago, no reason to stay in Unverified)
+  - Items explicitly marked "code shipped" / "won't verify" (e.g. shipped to production, no longer testable) → close directly (remove from Unverified, optionally note in Recently Completed)
+  - Long-pending ⏳ items impossible or no longer worth verifying → move to Paused Tasks or archive
 
 ## Global Rules
 
-1. **Project Root Detection**: Search upward from current directory until finding `.git` or `PROGRESS.md`.
-2. **File Path**: All operations target `PROGRESS.md` in project root.
-3. **Language Following User**: Analyze commit history and user input to auto-detect language.
-4. **If PROGRESS.md does not exist**: Ask user to initialize it.
-5. **CRITICAL: Preserve Existing Format**: Never restructure PROGRESS.md. Only extract completed tasks.
+Find project root (upward to `.git`/`PROGRESS.md`); target `PROGRESS.md` in root; language follows user input > commit history > locale (en/zh); if file missing, ask user to init; preserve existing format, never restructure.
 
 ## What to Archive
 
-**Archive when:**
-- A major task (e.g., "TS Runtime Rewrite") has all phases marked ✅ completed
-- User explicitly requests archiving completed work
+**Archive when:** A major task has all phases marked ✅, OR user explicitly requests archiving.
 
-**Archive content:**
-- Task name + completion date
-- All phases (1 line per phase + link)
-- Design document links
-- Key decisions (1 line each)
+**Archive content:** Task name + completion date · all phases (1 line per phase + link) · design document links · key decisions (1 line each).
 
-**Keep in PROGRESS.md:**
-- Current in-progress tasks
-- Next planned tasks
-- Recently completed (transition, max 2-3 items)
-- Archive links pointing to archived files
+**Keep in PROGRESS.md:** Current in-progress tasks · next planned tasks · Recently Completed (max 2-3) · archive links.
 
 ## Execution Flow
 
 ### Mode Selection
 
 Read user intent from message context:
-- Keywords like "verify", "verify-cleanup", "待手测", "unverified", "验证清理", "待手测清理" → Mode C (Verify-cleanup)
-- Keywords like "清理", "精简", "trim", "太长了", "堆积", "进度太长" → Mode B (Trim)
-- Keywords like "归档", "archive", "完成", "收尾" → Mode A (Major Task Archive)
+- "verify", "verify-cleanup", "待手测", "unverified", "验证清理", "待手测清理" → Mode C
+- "清理", "精简", "trim", "太长了", "堆积", "进度太长" → Mode B
+- "归档", "archive", "完成", "收尾" → Mode A
 - Ambiguous → ask user which mode
 
-**Ambiguity rule**: If user says "清理" (Mode B keyword) but the largest bloat source is an Unverified table rather than Recently Completed, ask whether to run Mode B (Recently Completed trim) or Mode C (Unverified table verify-cleanup). Same for the reverse.
+**Ambiguity rule**: If user says "清理" (Mode B keyword) but the largest bloat source is an Unverified table rather than Recently Completed, ask whether to run Mode B (Recently Completed trim) or Mode C (Unverified verify-cleanup). Same for the reverse.
 
 ---
 
@@ -78,22 +50,21 @@ Read user intent from message context:
 #### Step 1: Read PROGRESS.md
 
 - Read full content
-- Identify completed tasks (marked with ✅ or similar completion indicators)
+- Identify completed tasks (✅ or similar completion indicators)
 - Detect task structure: major task → phases → details
 
-### Step 2: Identify Tasks to Archive
+#### Step 2: Identify Tasks to Archive
 
 **Detection criteria:**
 - Task section header contains completion indicator (✅, "已完成", "Completed")
 - All phases under this task are marked completed
 - Task is in "Recently Completed" section (not "Current Focus")
 
-**Ask user confirmation:**
-"Found completed task: [Task Name]. Archive it to history?"
+**Ask user confirmation:** "Found completed task: [Task Name]. Archive it to history?"
 
-### Step 3: Create Archive File
+#### Step 3: Create Archive File
 
-**Archive directory structure:**
+**Directory structure:**
 ```
 docs/progress/archive/
 ├── ts-runtime-rewrite-2026-05.md
@@ -128,15 +99,15 @@ Rewrite Gateway + TUI runtime from Python to TypeScript. 4 phases, 1025 tests pa
 - Batch execution mode for Crew
 ```
 
-> **Note:** Archive files are L2 (Reference) in the Progressive Disclosure model. They should be concise — each phase 1 line + link, not full implementation notes. Design details belong in the spec/plan docs they link to.
+> **Note:** Archive files are L2 (Reference) in the Progressive Disclosure model. Each phase 1 line + link, not full implementation notes. Design details belong in the spec/plan docs they link to.
 
-### Step 4: Update PROGRESS.md
+#### Step 4: Update PROGRESS.md
 
 - Remove archived task content
-- Keep only current in-progress + next planned + recently completed (max 2-3)
+- Keep only current in-progress + next planned + Recently Completed (max 2-3)
 - Update Archive Links section with new archive file
 
-### Step 5: Update Archive Index
+#### Step 5: Update Archive Index
 
 Update `docs/progress/archive/README.md`:
 ```markdown
@@ -148,11 +119,11 @@ Update `docs/progress/archive/README.md`:
 - [Cleanup Python (2026-07)](./cleanup-python-2026-07.md) - Remove legacy code
 ```
 
-### Step 6: Commit Archive (Optional)
+#### Step 6: Commit Archive (Optional)
 
-- Ask: "Commit archive changes?"
-- If yes: `git add docs/progress/archive/ PROGRESS.md && git commit -m "archive: [Task Name] completed"`
-- If no: Just write files, let user commit manually
+Ask: "Commit archive changes?"
+- Yes: `git add docs/progress/archive/ PROGRESS.md && git commit -m "archive: [Task Name] completed"`
+- No: just write files, let user commit manually
 
 ---
 
@@ -168,8 +139,8 @@ Update `docs/progress/archive/README.md`:
 #### Step 2: Identify Items to Trim
 
 **Primary trim target:** Recently Completed.
-- Keep only the most recent 2-3 items, archive the rest.
-- Blockers / Next Phases are NOT handled here — /progress-save cleans them automatically.
+- Keep only the most recent 2-3 items, archive the rest
+- Blockers / Next Phases are NOT handled here — /progress-save cleans them automatically
 
 **Secondary trim target:** Unverified / 待手测 table overflow.
 - If Unverified table has > 3 items already marked ✅ verified → suggest redirecting to Mode C (these don't belong in Unverified anymore; trimming them here would lose the verify-state nuance)
@@ -324,36 +295,8 @@ Same as Mode A Step 6. Suggested commit message: `archive: verify-cleanup N item
 "unverified 表里一堆 ✅ 的，移走"
 ```
 
-## Archive Trigger Detection in progress-save
+## Recommended Workflow
 
-When `/progress-save` updates PROGRESS.md, it triggers archive suggestions at three levels:
-
-**Major task completion (→ Mode A):**
-1. Find major task sections with ✅ or "已完成" markers
-2. Check if all phases under this task are completed
-3. If found: Prompt user "Task '[Name]' appears complete. Archive it with /progress-archive?"
-
-**Bloat detection (→ Mode B):**
-1. PROGRESS.md > 300 lines → suggest /progress-archive trim
-2. Recently Completed > 5 items → suggest /progress-archive trim
-
-**Unverified table bloat (→ Mode C):**
-1. Detect Unverified / 待手测 table (if present)
-2. Count ✅ verified items in Unverified → if > 3: suggest /progress-archive verify-cleanup (these no longer belong in Unverified)
-3. Count total Unverified items → if > 10: suggest /progress-archive verify-cleanup for triage
-
-This lets save act as a trigger point for archive suggestions.
-
-## Archive vs Save
-
-| Action | progress-save | progress-archive |
-|--------|---------------|------------------|
-| Update PROGRESS.md | ✓ (update phases) | ✓ (remove completed/archived items) |
-| Create archive files | ✗ | ✓ (Mode A: task archive; Mode B: trim; Mode C: verify-cleanup) |
-| Trigger | Before each commit | Major task done / bloat / Unverified table overflow |
-| Frequency | High (daily) | Low (weekly/monthly) |
-
-**Recommended workflow:**
 - `/progress-save` before each commit
 - When save detects completed task → prompts Mode A archive
 - When save detects bloat (Recently Completed overflow or PROGRESS > 300 lines) → prompts Mode B trim

@@ -1,7 +1,7 @@
 ---
 name: progress-merge
 description: Use when PROGRESS.md has merge conflicts (after `git merge` / `git rebase` / `git cherry-pick` involving PROGRESS.md), or when user wants to compare/merge progress state between two branches (合并 PROGRESS 冲突, merge progress across branches, 两个分支的 PROGRESS 怎么合, PROGRESS conflict 怎么解决, 解决 progress 冲突, dry-run compare branches)
-version: 1.1.0
+version: 1.1.1
 ---
 
 # Progress Merge
@@ -10,16 +10,7 @@ Merge PROGRESS.md across two git branches semantically. Use during merge conflic
 
 ## Global Rules
 
-1. **Project Root Detection**: Search upward from current directory until finding a directory containing `.git` or `PROGRESS.md`.
-2. **File Path**: All operations target `PROGRESS.md` in project root.
-3. **Language Following User**: Analyze commit history and user input to auto-detect language.
-   - **Detection Priority**: User input > Recent commit messages > System locale
-   - **Supported Languages**: English (en) and Chinese (zh)
-4. **If PROGRESS.md does not exist on either side**: Do NOT initialize (merge is not the right place for that). Instead:
-   - Both sides missing → exit and direct user to `/progress-save`
-   - One side missing → propose degenerate merge (take the other side as-is); user confirms before write
-5. **CRITICAL: Preserve Existing Format**: Never restructure either side's section naming style; output follows ours (or user-chosen side).
-6. **Sequencing Awareness**: see "Sequencing Awareness" section below.
+Find project root (upward to `.git`/`PROGRESS.md`); target `PROGRESS.md` in root; language follows user input > commit history > locale (en/zh); preserve existing format, never restructure either side's section naming style; output follows ours (or user-chosen side). If PROGRESS.md does not exist on either side: do NOT initialize (merge is not the right place for that) — both sides missing → exit and direct user to `/progress-save`; one side missing → propose degenerate merge (take the other side as-is), user confirms before write. Sequencing Awareness: see dedicated section below.
 
 ## Execution Modes
 
@@ -64,7 +55,7 @@ Store result as `<GITDIR>`. Use `<GITDIR>/...` instead of `.git/...` in all subs
 | 2 | `test -d <GITDIR>/rebase-apply` | rebase (apply) | rebase |
 | 3 | `test -f <GITDIR>/CHERRY_PICK_HEAD` | cherry-pick | cherry-pick |
 | 4 | `test -f <GITDIR>/MERGE_HEAD` | merge | merge |
-| 5 | all failed | not in conflict | → §11 "no conflict context" |
+| 5 | all failed | not in conflict | → Error Handling: "Not in unmerged state" |
 
 **Step 0c**: Sequencing check — if other unmerged files exist besides PROGRESS.md, surface warning (see Sequencing Awareness Layer 2).
 
@@ -126,18 +117,7 @@ Before writing, re-read working tree PROGRESS.md and compare hash with Step 1. I
 
 ## Section Detection Table
 
-| Content Type | Possible Section Names |
-|---|---|
-| Last updated time | `> Last updated`, `> 最后更新` |
-| Current focus | `🎯`, `Current Focus`, `当前`, `Current` |
-| Next steps | `📥`, `Next Phases`, `Todo`, `下一步`, `Next` |
-| Paused tasks | `⏸️`, `Paused Tasks`, `暂停`, `Hold` |
-| Completed | `✅`, `Completed`, `已完成`, `Recently Completed` |
-| Blockers | `🧱`, `Blockers`, `Issues`, `问题` |
-| Notes | `🧠`, `Context Notes`, `Notes`, `备注`, `Context` |
-| Recovery | `⚡`, `Quick Recovery`, `恢复`, `Recovery` |
-| Archive Links | `🏛️`, `Archive Links`, `归档`, `Archive` |
-| Unverified / 待手测 | `🔍`, `Unverified`, `待手测`, `TTY 待手测`, `Manual Test Pending`, `待验证` |
+Sections: `> Last updated`/`> 最后更新` | 🎯/Current/当前 | 📥/Next Phases/Todo/下一步 | ⏸️/Paused/暂停 | ✅/Completed/已完成/Recently Completed | 🧱/Blockers/问题 | 🧠/Notes/备注 | ⚡/Recovery/恢复 | 🏛️/Archive/归档 | 🔍/Unverified/待手测/待验证/Manual Test Pending
 
 If both sides use different section naming styles → add to "must-ask" queue.
 
@@ -295,7 +275,7 @@ No write questions. Output guidance for next steps (use Mode A for actual merge,
 | User selects "Other" free text in batch questions | Insert raw content into corresponding section |
 | User selects "Cancel" after preview | No write, git state unchanged |
 | `git add` fails (permissions/lock) | File written, tell user manual `git add` |
-| Other unmerged files exist | §9.2 Layer 2 flow: soft warn + user decides |
+| Other unmerged files exist | Sequencing Awareness Layer 2 flow: soft warn + user decides |
 | `<<<<<<<` markers but git not in unmerged state | Offer: ① manual cleanup ② Mode C compare ③ cancel |
 
 ## Difference from Other Skills

@@ -1,7 +1,7 @@
 ---
 name: progress-save
 description: Use when user asks to update, save, record, or write to PROGRESS.md (更新进度, 保存进度, 记录进度, 更新 PROGRESS.md), or before git commit/stash/checkout/PR/push, or at end of work session
-version: 1.5.0
+version: 1.6.0
 ---
 
 # Progress Save
@@ -10,13 +10,7 @@ Update PROGRESS.md to record current work state. No git operations involved - pu
 
 ## Global Rules
 
-1. **Project Root Detection**: Search upward from current directory until finding a directory containing `.git` or `PROGRESS.md`.
-2. **File Path**: All operations target `PROGRESS.md` in project root.
-3. **Language Following User**: Analyze commit history and user input to auto-detect language.
-   - **Detection Priority**: User input > Recent commit messages > System locale
-   - **Supported Languages**: English (en) and Chinese (zh)
-4. **If PROGRESS.md does not exist**: Ask user to initialize it.
-5. **CRITICAL: Preserve Existing Format**: If PROGRESS.md already exists, preserve its structure and sections. Only update content, never restructure.
+Find project root (upward to `.git`/`PROGRESS.md`); target `PROGRESS.md` in root; language follows user input > commit history > locale (en/zh); if file missing, ask user to init; **preserve existing format, never restructure** (see Format Preservation Policy below).
 
 ## Format Preservation Policy
 
@@ -169,52 +163,40 @@ Before writing or updating any entry, run through this checklist. If any item hi
 
 ## Execution Flow
 
-### Step 0: Conflict State Pre-check (NEW)
+### Step 0: Conflict State Pre-check
 
-- Execute `git diff --name-only --diff-filter=U` to detect unmerged files
-- If PROGRESS.md is in unmerged state OR contains `<<<<<<<` markers:
-    Output: "PROGRESS.md is in merge conflict state. Use /progress-merge
-             to resolve, then re-run /progress-save."
-    Halt execution (do not proceed to Step 1-5)
-- Otherwise: proceed to Step 1
+- `git diff --name-only --diff-filter=U` to detect unmerged files
+- If PROGRESS.md is unmerged OR contains `<<<<<<<` markers:
+    Output: "PROGRESS.md is in merge conflict state. Use /progress-merge to resolve, then re-run /progress-save."
+    Halt (do not proceed)
+- Otherwise: proceed
 
 ### Step 1: Collect Context
 
-- Read current `PROGRESS.md` content.
-- Execute `git status --short` to get changed file list.
-- Execute `git diff --stat` to understand change scope.
-- Execute `git log -5 --oneline` to learn historical context.
-- Analyze changes to infer task progress.
+- Read `PROGRESS.md`
+- `git status --short` — changed file list
+- `git diff --stat` — change scope
+- `git log -5 --oneline` — historical context
+- Analyze changes to infer task progress
 
 ### Step 2: Intelligent Section Detection
 
-Based on existing PROGRESS.md structure, find appropriate sections for updates:
+Match content to existing sections by patterns:
 
-| Content Type | Possible Section Names |
-|--------------|------------------------|
-| Last updated time | `> Last updated`, `> 最后更新` |
-| Current focus | `🎯`, `Current Focus`, `当前`, `Current` |
-| Next steps | `📥`, `Next Phases`, `Todo`, `下一步`, `Next` |
-| Paused tasks | `⏸️`, `Paused Tasks`, `暂停`, `Hold` |
-| Completed | `✅`, `Completed`, `已完成`, `Recently Completed` |
-| Blockers | `🧱`, `Blockers`, `Issues`, `问题` |
-| Notes | `🧠`, `Context Notes`, `Notes`, `备注`, `Context` |
-| Recovery | `⚡`, `Quick Recovery`, `恢复`, `Recovery` |
-| Archive Links | `🏛️`, `Archive Links`, `归档`, `Archive` |
+Sections: `> Last updated`/`> 最后更新` | 🎯/Current/当前 | 📥/Next Phases/Todo/下一步 | ⏸️/Paused/暂停 | ✅/Completed/已完成/Recently Completed | 🧱/Blockers/问题 | 🧠/Notes/备注 | ⚡/Recovery/恢复 | 🏛️/Archive/归档 | 🔍/Unverified/待手测/待验证/Manual Test Pending
 
-**Matching logic:**
-1. Search for section names matching content type patterns
-2. If found, update within that section
-3. If not found, append to most relevant existing section or ask user
+- Search for section names matching patterns above
+- If found: update within that section
+- If not found: append to most relevant section or ask user
 
 ### Step 3: Update Content (Preserve Structure, Apply All Rules)
 
 Update content while preserving the exact structure. **Every item must pass Pre-Write Self-Check + Section Contract + Size Budget + Brevity Guidelines.** Default to compression over completeness — details belong in L1/L2.
 
-1. **Last updated time**: Update header timestamp if exists.
-2. **Completed tasks**: Add to appropriate completed section — concise per Brevity Guidelines.
-3. **In-progress**: Update status — link to spec/plan if available, otherwise concise summary.
-4. **Key files**: If there's a "恢复" or "Recovery" section, add key file paths.
+1. **Last updated time**: Update header timestamp if exists
+2. **Completed tasks**: Add to appropriate completed section — concise per Brevity Guidelines
+3. **In-progress**: Update status — link to spec/plan if available, otherwise concise summary
+4. **Key files**: If "Recovery" section exists, add key file paths
 5. **Context Notes**: Record key findings, decisions, recovery context per Brevity Guidelines. Link to docs for large content; keep concise summaries inline.
 
 **Cleanup rules (mandatory — unconditional, not advisory):**
@@ -232,49 +214,65 @@ Every item is a hard trigger, not "compress if it has grown beyond…". Hit = ch
 After updating content, check three conditions (in priority order):
 
 **Condition A — Major task completion (higher priority):**
-- Major task section header contains ✅ or "已完成" marker
-- All phases/subtasks under this task are marked completed
-- Task is in "Recently Completed" section (not "Current Focus")
+- Major task header contains ✅ or "已完成"
+- All phases/subtasks under it marked completed
+- Task is in "Recently Completed" (not "Current Focus")
 
-**If A detected:**
-Prompt user: "Task '[Task Name]' appears complete. Archive it with `/progress-archive`?"
-- If PROGRESS.md also > 300 lines or Recently Completed > 5 items, append: "Also: PROGRESS.md is getting long — consider trimming after archiving."
+→ Prompt: "Task '[Name]' appears complete. Archive it with `/progress-archive`?"
+  (If PROGRESS.md > 300 lines OR Recently Completed > 5 items, append: "Also: PROGRESS.md is getting long — consider trimming after archiving.")
 
 **Condition B — Bloat without completed major task:**
-- No completed major task detected, BUT:
-- PROGRESS.md > 300 lines, OR Recently Completed > 5 items
+- No completed major task, BUT PROGRESS.md > 300 lines OR Recently Completed > 5 items
 
-**If B detected:**
-Output (non-blocking): "PROGRESS.md 已有 N 行 / Recently Completed 有 N 条。Run `/progress-archive` and say '清理' or 'trim' to archive overflow completed items."
+→ Output (non-blocking): "PROGRESS.md 已有 N 行 / Recently Completed 有 N 条。Run `/progress-archive` and say '清理' or 'trim' to archive overflow completed items."
 
 **Condition C — Unverified / 待手测 table bloat:**
-- Detect Unverified / 待手测 table in PROGRESS.md (section names: "Unverified", "待手测", "TTY 待手测", "Manual Test Pending", etc.)
+- Detect Unverified / 待手测 table (section names: "Unverified", "待手测", "TTY 待手测", "Manual Test Pending", etc.)
 - Count ✅ verified items in Unverified → if > 3: trigger
 - Count total Unverified items → if > 10: trigger
 
-**If C detected:**
-Output (non-blocking): "Unverified table has N items (M already ✅ verified). Run `/progress-archive` with 'verify-cleanup' or '待手测清理' to triage — verified items don't belong in Unverified anymore."
-
-**Example detection:**
-```
-## ✅ TS Runtime Rewrite Phase 1-4
-### Phase 1: ✅
-### Phase 2: ✅
-### Phase 4.1: ✅
-...
-→ All phases complete → Prompt archive suggestion (Condition A)
-
-## Unverified / 待手测
-| # | Item | Status |
-| 2 | chat.send timeout | ✅ verified |
-| 3 | streaming output | ✅ verified |
-| ... (12 more, 9 are ✅) |
-→ 9 ✅ items in Unverified (>3) AND 15 total (>10) → Prompt verify-cleanup suggestion (Condition C)
-```
+→ Output (non-blocking): "Unverified table has N items (M already ✅ verified). Run `/progress-archive` with 'verify-cleanup' or '待手测清理' to triage — verified items don't belong in Unverified anymore."
 
 ### Step 5: Write to Disk
 
 Write updated content preserving exact structure and formatting style.
+
+### Step 6: Lint Pass (read-only, post-write)
+
+After writing, run a read-only lint pass over the updated PROGRESS.md. **Only output warnings — never modify content.** User decides whether to act.
+
+Output format (compact, one line per warning; skip rules with no warnings):
+
+```
+🔍 Lint warnings:
+- [Rule 2] Phase "<name>" plan last updated YYYY-MM-DD (>30d), review if still accurate
+- [Rule 3] Blockers/Paused reference "Phase X" which is no longer in Next Phases or Recently Completed — consider updating
+- [Rule 4] PROGRESS.md is N lines (>500) — strongly consider /progress-archive trim
+```
+
+If no warnings: output "🔍 Lint: clean."
+
+**Rule 2 — Stale Next Phases:**
+- Condition: A line under `📥 Next Phases` (or equivalent) references a plan/spec file via path or link, AND that file's mtime > 30 days old
+- Fallback (if no file link): if the Phase line itself contains a date (e.g., "(planned 2026-05-15)") older than 30 days
+- Final fallback: if PROGRESS.md's own `> Last updated` header > 30 days old AND Next Phases is non-empty
+- Action: report Phase name + last-updated date, prompt review
+
+**Rule 3 — Cross-reference consistency (cheap version):**
+- Condition: `⏸️ Paused Tasks` or `🧱 Blockers` section references a "Phase X" / "Phase Y" identifier (by name or number) that does NOT appear in `📥 Next Phases`, `✅ Recently Completed`, or `🎯 Current Focus`
+- Action: report the dangling reference, prompt user to update or remove
+- Note: this catches "Blockers mention Phase B-E but those phases were archived/trimmed" scenarios
+
+**Rule 4 — File length:**
+- Condition: PROGRESS.md > 500 lines
+- Action: report line count, strongly suggest `/progress-archive` (stricter than Step 4 Condition B's 300-line advisory — Step 4 prompts at write time; Rule 4 persists every save until addressed)
+
+**Implementation notes:**
+- All checks are pure reads on the just-written file (plus optional `stat` for Rule 2 file mtimes)
+- No content modification — user decides whether to act
+- Warnings are idempotent across saves (same state → same warnings); accept this to avoid drift
+- Rule 1 (Unverified bloat) is not needed here — Step 4 Condition C already covers it at write time
+- If Rule 4 and Step 4 Condition B both fire, that's fine — Step 4 prompts action at write time, Step 6 reinforces on next save if unaddressed
 
 ## Large File Reading (Anti-Thrashing Policy)
 
@@ -325,31 +323,8 @@ This standard format is provided as **reference only**. Projects can adopt it if
 <!-- [version — task name (date)](archive-link) -->
 ```
 
-**Section Purpose:**
+## Trigger Timing
 
-| Section | Purpose | Used By |
-|---------|---------|---------|
-| `🎯 Current Focus` | In-progress tasks | restore, save, summary |
-| `📥 Next Phases` | Planned phases | restore, save, summary |
-| `⏸️ Paused Tasks` | Paused mid-way tasks | restore, save (track paused state) |
-| `✅ Recently Completed Phases` | Completed phases (max 2-3) | save, archive (detects completion) |
-| `🧱 Blockers & Issues` | Active blockers | restore (quick reference) |
-| `🧠 Context Notes` | Key findings, decisions, recovery context (concise; link large content) | restore (context recall) |
-| `⚡ Quick Recovery` | Restore commands | restore |
-| `🏛️ Archive Links` | Archived major tasks | archive (updates links) |
-
-## Difference from Other Skills
-
-| Feature | progress-save | progress-archive | progress-summary | progress-merge |
-|---------|---------------|------------------|------------------|----------------|
-| Update PROGRESS.md | ✓ | ✓ (remove completed) | ✗ | ✓ (merge conflicts) |
-| Create archive files | ✗ | ✓ | ✗ | ✗ |
-| Git operations | ✗ | Optional commit | ✗ | Optional `git add` |
-| Generate summary | ✗ | ✗ | ✓ | ✗ |
-| Trigger detection | Archive suggestion (Mode A/B/**C**), **Merge redirect** | N/A | N/A | N/A |
-| Resolves PROGRESS.md conflicts | ✗ | ✗ | ✗ | ✓ |
-
-**Trigger timing:**
 - Before `git commit`: Update progress before creating commit
 - Before `git stash`: Save current state before stashing
 - Before `git checkout`: Update before switching branches
