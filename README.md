@@ -88,10 +88,13 @@ Single PROGRESS.md in the project root. Not a per-commit ritual. Pick the right 
 - Session interrupted mid-way (network drop, switching machines, explicit handoff, pre-compaction) → `/progressing` (save) or `/progressing save`
 
 ### Reading project state files (anti-thrashing)
-When reading CLAUDE.md, AGENTS.md, or any project doc > 300 lines:
-- First read only the first 50 lines (frontmatter + section headings) using Read with `offset`/`limit`
-- Then read only the specific sections you need by line range
-- Never call Read on a > 300-line file without `offset`/`limit` — this is the #1 cause of autocompact thrashing
+When reading any project doc that may be large (CLAUDE.md, AGENTS.md, specs, plans, handoffs):
+- If the file is > 300 lines, never call Read without `offset`/`limit`
+  — read first 50 lines (frontmatter + section headings), then targeted
+  section reads by line range
+- For multi-file setups (multiple AGENTS.md / sub-folder CLAUDE.md):
+  budget the total per-call Read payload, not the per-file size —
+  a batch of medium files is worse than one large one for autocompact thrashing
 ```
 
 This lets LLM autonomously trigger the skill at appropriate times. PROGRESS.md stays small by design (≤ 60 lines) and is read in full.

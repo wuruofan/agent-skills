@@ -88,10 +88,9 @@ npx skills add wuruofan/agent-skills --skill web-fetch-as-markdown -g -y
 - 会话中途中断（断网、切换机器、显式交接、压缩前需保留）→ `/progressing`（save）或 `/progressing save`
 
 ### 读取项目状态文件（防 thrashing）
-读取 CLAUDE.md、AGENTS.md 或任何 >300 行的项目文档时：
-- 先只读前 50 行（frontmatter + section 标题），使用 Read 的 `offset`/`limit` 参数
-- 然后按行段定向读取需要的具体 section
-- 禁止对 >300 行的文件无 `offset`/`limit` 调用 Read —— 这是 autocompact thrashing 的头号诱因
+读取可能较大的项目文档时（CLAUDE.md、AGENTS.md、spec、plan、handoff 等）：
+- 文件 > 300 行时，绝不带 `offset`/`limit` 调 Read —— 先读前 50 行（frontmatter + section 标题），再按行段定向读取需要的具体 section
+- 多文件场景（多个 AGENTS.md / 子目录 CLAUDE.md）：按每次 Read 摄入总量预算，而不是按单文件大小 —— 一批中等文件比一个大文件更容易触发 autocompact thrashing
 ```
 
 让 LLM 在合适时机自主触发技能。PROGRESS.md 设计上保持小体量（≤ 60 行），可整读。
