@@ -15,18 +15,11 @@ npx skills add wuruofan/agent-skills -g -y
 ### 安装特定技能
 
 ```bash
-# 安装 progress 技能
-npx skills add wuruofan/agent-skills --skill progress-save -g -y
-npx skills add wuruofan/agent-skills --skill progress-restore -g -y
-npx skills add wuruofan/agent-skills --skill progress-archive -g -y
-npx skills add wuruofan/agent-skills --skill progress-summary -g -y
-npx skills add wuruofan/agent-skills --skill progress-merge -g -y
+# 安装 progressing 技能
+npx skills add wuruofan/agent-skills --skill progressing -g -y
 
 # 安装 web-fetch-as-markdown 技能
 npx skills add wuruofan/agent-skills --skill web-fetch-as-markdown -g -y
-
-# 安装多个技能
-npx skills add wuruofan/agent-skills --skill progress-save --skill progress-restore -g -y
 ```
 
 ## 收录的 Skills
@@ -49,60 +42,59 @@ npx skills add wuruofan/agent-skills --skill progress-save --skill progress-rest
 
 ---
 
-### Progress 技能套件
+### Progressing
 
-跟踪项目开发进度，跨设备保存和恢复工作会话，归档开发历史。
+一个 todo，但带普通 todo 没有的三件法宝 —— git 自动对账、显式关闭条件、读取时强制复审过期条目。一个 `PROGRESS.md` 在项目根目录就够了；git 已经替你跨设备同步，不必另维护外部归档。
 
-5 个核心技能：
+**它做什么：**
 
-| 技能 | 用途 | 使用时机 |
-|------|------|----------|
-| `progress-save` | 更新 PROGRESS.md | 提交前、stash 前、切换分支前 |
-| `progress-restore` | 恢复会话上下文 | 休息后、新设备、切换分支后 |
-| `progress-archive` | 归档历史记录 | 大任务完成时 |
-| `progress-summary` | 生成会话摘要 | 新会话继续工作时 |
-| `progress-merge` | 跨分支合并 PROGRESS.md | `git merge`/`git rebase`/`git cherry-pick` 后 PROGRESS.md 冲突时 |
+| 场景 | 动作 |
+|---|---|
+| 新会话 / 换机器 / "接着干 / 继续 / 之前干到哪了" | Load —— 读 PROGRESS.md，与 git 对账，列出过期条目，输出恢复报告 |
+| 本会话内某条 `Done when:` 已满足 | Close —— 当场删条目，刷新时间戳 |
+| 会话中途中断 | Save —— 写未完成状态。强指定可用 `/progressing save` |
 
-**快速选择指南：**
-- 要提交代码？ → `/progress-save`
-- 回来继续工作？ → `/progress-restore`
-- 大任务完成了？ → `/progress-archive`
-- 新会话继续工作？ → `/progress-summary`
-- 合并分支进度冲突？ → `/progress-merge`
+**什么时候不要用：** 常规 commit、没有任何未完成工作时 —— 如果没有"进行中"的事，就没什么可保留。
+
+**PROGRESS.md 格式：**
+
+```markdown
+# Progress
+
+> Last updated: 2026-09-09
+
+## Open
+- [2026-09-09] compact live/resume display — L4 run interrupted. Done when: `bun run test:l4` exits 0
+
+## Verify
+- [2026-09-04] /resume rendering after compact — commit `f00dbabe`. Awaiting: user TTY check
+
+## Paused
+- Tool/Thinking display — blocked until v0.7.1. Restart: docs/specs/tool-display.md
+```
+
+约束：条目 ≤ 2 行；`## Paused` ≤ 10 条；文件 ≤ 60 行；空章节省略。默认 `STALE_DAYS=7`。
 
 **推荐 AGENTS.md 配置：**
 
-> **重要**：以下内容必须安装到项目的 AGENTS.md / CLAUDE.md / GEMINI.md 中，AI 时序约束才能生效。否则 `/progress-merge` 将降级为较弱的触发方式。
+> **重要**：以下内容必须安装到项目的 AGENTS.md / CLAUDE.md / GEMINI.md 中，AI 时序约束才能生效。
 
 ```markdown
 ## 进度追踪（重要）
 
-触发场景（调用对应 skill）：
-- 提交/stash/PR/push 前 → `/progress-save`
-- 恢复工作、新设备、切换分支 → `/progress-restore`
-- 大任务完成、PROGRESS.md 过长 → `/progress-archive`
-- Unverified/待手测 表膨胀（✅ 项 >3 或总项 >10）→ `/progress-archive`（Mode C verify-cleanup）
-- 新会话继续之前工作 → `/progress-summary`
-- `git merge` / `rebase` / `cherry-pick` 涉及 PROGRESS.md（或检测到冲突标记）→ `/progress-merge`
-- 任何 git 操作导致 PROGRESS.md 处于冲突状态后 → `/progress-merge`
-
-### git merge / rebase / cherry-pick 执行顺序
-出现冲突时：
-1. 先解决非 PROGRESS.md 的冲突
-2. 验证（测试通过 / 合并正确）
-3. 调用 `/progress-merge` 处理 PROGRESS.md 冲突
-4. `git add` + 完成合并
+项目根目录一个 PROGRESS.md，不是每次提交的仪式。按上下文自动选动作：
+- 新会话 / 回到项目 / "接着干 / 继续 / 之前干到哪了" / 换机器 → `/progressing`（load）
+- 本会话内某条 `Done when:` 已满足 → `/progressing`（close）
+- 会话中途中断（断网、切换机器、显式交接、压缩前需保留）→ `/progressing`（save）或 `/progressing save`
 
 ### 读取项目状态文件（防 thrashing）
-读取 PROGRESS.md、CLAUDE.md、AGENTS.md 或任何 >300 行的项目文档时：
+读取 CLAUDE.md、AGENTS.md 或任何 >300 行的项目文档时：
 - 先只读前 50 行（frontmatter + section 标题），使用 Read 的 `offset`/`limit` 参数
 - 然后按行段定向读取需要的具体 section
 - 禁止对 >300 行的文件无 `offset`/`limit` 调用 Read —— 这是 autocompact thrashing 的头号诱因
 ```
 
-让 LLM 在合适时机自主触发技能。
-
-**说明：** `/progress-save` 会自动检测已完成的大任务并提示归档建议，也会检测 PROGRESS.md 合并冲突并跳转到 `/progress-merge`，并检测 Unverified 表膨胀以建议 `/progress-archive` Mode C。
+让 LLM 在合适时机自主触发技能。PROGRESS.md 设计上保持小体量（≤ 60 行），可整读。
 
 ---
 
