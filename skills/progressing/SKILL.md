@@ -1,7 +1,7 @@
 ---
 name: progressing
 description: Use as a git-backed todo that survives sessions. New session / switched machine / user says "接着干 / 继续 / 之前干到哪了 / 恢复进度 / 加载进度" → loads PROGRESS.md, reconciles against git, surfaces stale entries. Mid-session work that satisfies a `Done when:` → closes the entry in-place. Session interrupted mid-way (network drop, switching machines, explicit handoff, context compaction before state must survive) → writes unfinished state. NOT a per-commit ritual. PROGRESS.md is a single file in the project root.
-version: 2.0.0
+version: 2.0.1
 ---
 
 # Progressing
@@ -71,7 +71,7 @@ When work in this session satisfies an existing `Done when:` / `Awaiting:`, imme
 
 Triggers: user says "中断 / 切机器 / 保存进度 / 交接 / context 压缩前" / network dropping.
 
-1. `git diff --name-only --diff-filter=U` — if PROGRESS.md is unmerged, redirect to `progress-merge` first.
+1. `git diff --name-only --diff-filter=U` — if PROGRESS.md is unmerged: resolve by union — strip conflict markers, keep BOTH sides' entries (drop exact duplicate lines only, never choose between versions), stamp `> Last updated` today, `git add PROGRESS.md`, then continue. Never delete at merge time; ambiguous near-duplicates surface at the next Load's Verify pass.
 2. Read PROGRESS.md in full.
 3. Drop entries this session finished; re-stamp carried-over Open entries with today's date.
 4. Add new unfinished items via targeted Edit.
@@ -90,4 +90,4 @@ PROGRESS.md lives in the project root (single file, no external archive, no per-
 | Mid-session, a `Done when:` is now satisfied | Close (auto) |
 | Network dropping / switching machines / explicit handoff / pre-compaction with unfinished state | Save |
 | Routine commit with no unfinished work | Do nothing |
-| `git merge` / `rebase` / `cherry-pick` touches PROGRESS.md | Delegate to `progress-merge` |
+| `git merge` / `rebase` / `cherry-pick` touches PROGRESS.md | Resolve by union (Save step 1) |
