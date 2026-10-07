@@ -70,10 +70,16 @@ npx skills add wuruofan/agent-skills --skill web-fetch-as-markdown -g -y
 - [2026-09-04] /resume rendering after compact — commit `f00dbabe`. Awaiting: user TTY check
 
 ## Paused
-- Tool/Thinking display — blocked until v0.7.1. Restart: docs/specs/tool-display.md
+- [2026-09-01] Tool/Thinking display — blocked until v0.7.1. Restart: docs/specs/tool-display.md
 ```
 
-约束：条目 ≤ 2 行；`## Paused` ≤ 10 条；文件 ≤ 60 行；空章节省略。默认 `STALE_DAYS=7`。
+约束：条目 ≤ 2 行**且每行 ≤ 256 字符**；`## Paused` ≤ 10 条；文件 ≤ 60 行；空章节省略。默认 `STALE_DAYS=7`。
+
+光有行数约束并不够——2 行的条目也可能塞进 2 万字符。每次写完后用下面的命令机械校验宽度：
+
+```bash
+python3 -c 'import sys;b=[(i,len(l.rstrip())) for i,l in enumerate(open("PROGRESS.md",encoding="utf-8"),1) if len(l.rstrip())>256];[print(f"  L{i}: {n} chars — split or link out") for i,n in b];sys.exit(bool(b))'
+```
 
 **推荐 AGENTS.md 配置：**
 

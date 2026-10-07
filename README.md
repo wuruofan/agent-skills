@@ -70,10 +70,16 @@ A todo with three superpowers a plain todo doesn't have — git auto-reconciliat
 - [2026-09-04] /resume rendering after compact — commit `f00dbabe`. Awaiting: user TTY check
 
 ## Paused
-- Tool/Thinking display — blocked until v0.7.1. Restart: docs/specs/tool-display.md
+- [2026-09-01] Tool/Thinking display — blocked until v0.7.1. Restart: docs/specs/tool-display.md
 ```
 
-Limits: entry ≤ 2 lines; `## Paused` ≤ 10; file ≤ 60 lines; omit empty sections. Default `STALE_DAYS=7`.
+Limits: entry ≤ 2 lines **and ≤ 256 chars per line**; `## Paused` ≤ 10; file ≤ 60 lines; omit empty sections. Default `STALE_DAYS=7`.
+
+Line count alone is not a real constraint — a 2-line entry can carry 20,000 chars. Verify width mechanically after every write:
+
+```bash
+python3 -c 'import sys;b=[(i,len(l.rstrip())) for i,l in enumerate(open("PROGRESS.md",encoding="utf-8"),1) if len(l.rstrip())>256];[print(f"  L{i}: {n} chars — split or link out") for i,n in b];sys.exit(bool(b))'
+```
 
 **Recommended AGENTS.md Configuration:**
 
