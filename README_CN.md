@@ -59,27 +59,37 @@ npx skills add wuruofan/agent-skills --skill web-fetch-as-markdown -g -y
 **PROGRESS.md 格式：**
 
 ```markdown
-# Progress
+# Progress · managed by `progressing` skill
 
-> Last updated: 2026-09-09
+> Last updated: 2026-10-20
+
+> 一条目一行；详情在各自 spec/plan/debug 文件（见 `Detail:`）。手动编辑会破坏格式契约 —— 改完请跑格式闸门。
 
 ## Open
-- [2026-09-09] compact live/resume display — L4 run interrupted. Done when: `bun run test:l4` exits 0
+- [2026-10-20] eager terminal session — 落地完成，待真机验证. Done when: `bun run test:gateway` 全绿. Detail: docs/specs/2026-10-13-eager-terminal-session.md
 
 ## Verify
-- [2026-09-04] /resume rendering after compact — commit `f00dbabe`. Awaiting: user TTY check
+- [2026-10-19] ink CR 列漂移修复 — 提交 `04139ea0`. Awaiting: user TTY check
 
 ## Paused
-- [2026-09-01] Tool/Thinking display — blocked until v0.7.1. Restart: docs/specs/tool-display.md
+- [2026-09-01] Tool/Thinking display — 阻塞于 v0.7.1. Restart: docs/specs/tool-display.md
 ```
 
-约束：条目 ≤ 2 行**且每行 ≤ 256 字符**；`## Paused` ≤ 10 条；文件 ≤ 60 行；空章节省略。默认 `STALE_DAYS=7`。
+一个条目 = 一行。表头是纯日期。固定三个 section。每条目以 `Done when:` / `Awaiting:` / `Restart:` 结尾；`Detail: <path>` 指向存放详情的文件。
 
-光有行数约束并不够——2 行的条目也可能塞进 2 万字符。每次写完后用下面的命令机械校验宽度：
+H1 承载 managed-by 标记，其下一行短 `>` 承载格式说明——两处都会渲染，所以打开文件的人能看见谁在管它。闸门只允许 `>` 行是日期头或 ≤ 200 字符的 managed-by / 格式说明，表头因此回退成变更日志。
+
+**安装命令要写进项目的 AGENTS.md，不要写进台账。** 没装这个 skill 的 agent 根本不会打开 `PROGRESS.md`，那里的命令谁也看不到；而 `AGENTS.md` 是每个 agent 每次会话都会读的。
+
+约束：条目 ≤ 256 字符；`## Open` ≤ 15 条、`## Verify` ≤ 10 条、`## Paused` ≤ 10 条；文件 ≤ 60 行且 ≤ 12,000 字符。默认 `STALE_DAYS=7`。
+
+光有行数约束并不够——一行也能塞进 2 万字符，而且臃肿的台账每次会话都要整读一遍。**每次**写入 PROGRESS.md 后（load / close / save / 会话中临时改动）都要机械校验格式；命令内嵌在 skill 里，写入生效前必须 exit 0：
 
 ```bash
-python3 -c 'import sys;b=[(i,len(l.rstrip())) for i,l in enumerate(open("PROGRESS.md",encoding="utf-8"),1) if len(l.rstrip())>256];[print(f"  L{i}: {n} chars — split or link out") for i,n in b];sys.exit(bool(b))'
+# 运行 skills/progressing/SKILL.md 内嵌的 gate 代码块
 ```
+
+gate 不过意味着：把详情搬进它描述的那个文件，用 `Detail:` 链过去；把撑爆配额的条目关闭、确认或归档。
 
 **推荐 AGENTS.md 配置：**
 
@@ -92,6 +102,17 @@ python3 -c 'import sys;b=[(i,len(l.rstrip())) for i,l in enumerate(open("PROGRES
 - 新会话 / 回到项目 / "接着干 / 继续 / 之前干到哪了" / 换机器 → `/progressing`（load）
 - 本会话内某条 `Done when:` 已满足 → `/progressing`（close）
 - 会话中途中断（断网、切换机器、显式交接、压缩前需保留）→ `/progressing`（save）或 `/progressing save`
+
+> **换机器 / 新环境**：本仓库的 `PROGRESS.md` 由 `progressing` skill 管理。若该 skill 未安装，先装：
+> ```bash
+> npx skills add wuruofan/agent-skills --skill progressing -g -y
+> ```
+> 未安装时，`PROGRESS.md` 里的条目仍可读（纯 markdown），只是失去自动对账与闭合检查。
+
+### PROGRESS.md 保持小体量（这是它能整读的前提）
+PROGRESS.md 每次 load 都会完整重读，体积是每个会话都在付的成本。
+一个条目 = 一行；表头是纯日期；详情放在 spec/plan/debug 文件里，用 `Detail: <path>` 链过去。
+**每次写入 PROGRESS.md 后都要跑格式闸门** —— 不只是 load 和 save 时。「基本都跑」的闸门等于没跑。
 
 ### 读取项目状态文件（防 thrashing）
 读取可能较大的项目文档时（CLAUDE.md、AGENTS.md、spec、plan、handoff 等）：

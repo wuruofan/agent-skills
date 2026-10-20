@@ -59,27 +59,37 @@ A todo with three superpowers a plain todo doesn't have — git auto-reconciliat
 **PROGRESS.md format:**
 
 ```markdown
-# Progress
+# Progress · managed by `progressing` skill
 
-> Last updated: 2026-09-09
+> Last updated: 2026-10-20
+
+> 一条目一行；详情在各自 spec/plan/debug 文件（见 `Detail:`）。手动编辑会破坏格式契约 —— 改完请跑格式闸门。
 
 ## Open
-- [2026-09-09] compact live/resume display — L4 run interrupted. Done when: `bun run test:l4` exits 0
+- [2026-10-20] eager terminal session — 落地完成，待真机验证. Done when: `bun run test:gateway` 全绿. Detail: docs/specs/2026-10-13-eager-terminal-session.md
 
 ## Verify
-- [2026-09-04] /resume rendering after compact — commit `f00dbabe`. Awaiting: user TTY check
+- [2026-10-19] ink CR 列漂移修复 — 提交 `04139ea0`. Awaiting: user TTY check
 
 ## Paused
-- [2026-09-01] Tool/Thinking display — blocked until v0.7.1. Restart: docs/specs/tool-display.md
+- [2026-09-01] Tool/Thinking display — 阻塞于 v0.7.1. Restart: docs/specs/tool-display.md
 ```
 
-Limits: entry ≤ 2 lines **and ≤ 256 chars per line**; `## Paused` ≤ 10; file ≤ 60 lines; omit empty sections. Default `STALE_DAYS=7`.
+One entry = one line. The header is a bare date. Exactly three sections. Every entry ends with `Done when:` / `Awaiting:` / `Restart:`; `Detail: <path>` points at the file holding the detail.
 
-Line count alone is not a real constraint — a 2-line entry can carry 20,000 chars. Verify width mechanically after every write:
+The H1 carries the managed-by marker and a short `>` line carries the format note — both render, so a human opening the file sees who owns it. The gate allows a `>` line only when it is the date header or a short (≤ 200 chars) managed-by / format note, so the header cannot drift back into a changelog.
+
+**Put the install command in the project's AGENTS.md, not in the ledger.** An agent without this skill never opens `PROGRESS.md`, so a command there reaches nobody; `AGENTS.md` is read by every agent on every session.
+
+Limits: entry ≤ 256 chars; `## Open` ≤ 15, `## Verify` ≤ 10, `## Paused` ≤ 10; file ≤ 60 lines and ≤ 12,000 chars. Default `STALE_DAYS=7`.
+
+Line count alone is not a real constraint — a single line can carry 20,000 chars, and a bloated ledger is re-read in full on every session. Verify the format mechanically after **every** write (Load, Close, Save, and ad-hoc edits); the command is embedded in the skill and must exit 0 before a write stands:
 
 ```bash
-python3 -c 'import sys;b=[(i,len(l.rstrip())) for i,l in enumerate(open("PROGRESS.md",encoding="utf-8"),1) if len(l.rstrip())>256];[print(f"  L{i}: {n} chars — split or link out") for i,n in b];sys.exit(bool(b))'
+# run the gate block embedded in skills/progressing/SKILL.md
 ```
+
+A failed gate means: move the detail into the file it describes and link it with `Detail:`; close, confirm, or archive entries that pushed a section over cap.
 
 **Recommended AGENTS.md Configuration:**
 
@@ -92,6 +102,18 @@ Single PROGRESS.md in the project root. Not a per-commit ritual. Pick the right 
 - New session / returning to a project / "接着干 / 继续 / 之前干到哪了" / switched machine → `/progressing` (load)
 - Mid-session, an entry's `Done when:` was just satisfied → `/progressing` (close)
 - Session interrupted mid-way (network drop, switching machines, explicit handoff, pre-compaction) → `/progressing` (save) or `/progressing save`
+
+> **New machine / fresh environment**: this repo's `PROGRESS.md` is managed by the `progressing` skill. If it is not installed:
+> ```bash
+> npx skills add wuruofan/agent-skills --skill progressing -g -y
+> ```
+> Without it the entries are still readable (plain markdown) — you only lose auto-reconciliation and closure checks.
+
+### PROGRESS.md stays small (this is why it is read in full)
+PROGRESS.md is re-read completely on every load, so its size is paid for every session.
+One entry = one line; the header is a bare date; detail lives in a spec/plan/debug file
+linked with `Detail: <path>`. Run the format gate after every write to PROGRESS.md —
+not only on load and save. A gate that runs "usually" does not run.
 
 ### Reading project state files (anti-thrashing)
 When reading any project doc that may be large (CLAUDE.md, AGENTS.md, specs, plans, handoffs):
